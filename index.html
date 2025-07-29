@@ -4,13 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!--
-        Changelog v0.01
-        - Replaced automatic page loading with a manual "Sync Sheets" button.
-        - The page now loads with an initial prompt.
-        - Added a custom SVG loading animation that displays during the GitHub API fetch.
-        - Clicking the theme switcher now redraws cards with the new theme's colors if they are already loaded.
+        Changelog v0.02
+        - Added glassmorphism card style with a frosted glass effect (backdrop-filter).
+        - Implemented a 3D tilt hover effect for the cards using JavaScript.
+        - Added decorative background "blobs" to enhance the glass effect.
+        - Updated theme variables to support the new transparent card style.
     -->
-    <title>SwiftSheets Index v0.01</title>
+    <title>SwiftSheets Index v0.02</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -27,9 +27,10 @@
             --highlight-primary: #E95420; /* Ubuntu Orange */
             --highlight-secondary: #dd4814;
             --border-color: #58334d;
-            --shadow-color: rgba(0,0,0,0.3);
             --particle-color: #E95420;
             --particle-line-color: #58334d;
+            --bg-card-glass: rgba(59, 20, 47, 0.25);
+            --border-card-glass: rgba(233, 84, 32, 0.2);
         }
 
         .theme-pastel-terminal {
@@ -40,22 +41,24 @@
             --highlight-primary: #A48DFA;
             --highlight-secondary: #8DFAAF;
             --border-color: #403d52;
-            --shadow-color: rgba(0,0,0,0.2);
             --particle-color: #A48DFA;
             --particle-line-color: #403d52;
+            --bg-card-glass: rgba(42, 39, 57, 0.25);
+            --border-card-glass: rgba(164, 141, 250, 0.2);
         }
 
         .theme-light-fruity {
-            --bg-dark: #FFF9F2; /* Creamy White */
+            --bg-dark: #FFF9F2;
             --bg-card: #FFFFFF;
-            --text-main: #5D4037; /* Brown */
+            --text-main: #5D4037;
             --text-muted: #795548;
-            --highlight-primary: #FF7043; /* Deep Orange */
-            --highlight-secondary: #FFCA28; /* Amber */
+            --highlight-primary: #FF7043;
+            --highlight-secondary: #FFCA28;
             --border-color: #FFCCBC;
-            --shadow-color: rgba(0,0,0,0.1);
             --particle-color: #FF7043;
             --particle-line-color: #FFCCBC;
+            --bg-card-glass: rgba(255, 255, 255, 0.4);
+            --border-card-glass: rgba(255, 112, 67, 0.3);
         }
 
         /* --- Core Styles --- */
@@ -65,36 +68,63 @@
             background-color: var(--bg-dark);
             color: var(--text-main);
             transition: background-color 0.5s ease, color 0.5s ease;
+            overflow-x: hidden;
         }
         h1, h2, h3, h4, h5, h6 { font-family: 'Ubuntu Mono', monospace; }
+        
+        /* --- Decorative Background Blobs --- */
+        .background-blobs {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            overflow: hidden;
+            z-index: 0;
+        }
+        .background-blobs div {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.4;
+            transition: background 0.5s ease;
+        }
+        .blob1 {
+            width: 450px; height: 450px;
+            background: var(--highlight-primary);
+            top: -150px; left: -150px;
+        }
+        .blob2 {
+            width: 350px; height: 350px;
+            background: var(--highlight-secondary);
+            bottom: -100px; right: -100px;
+        }
 
         #particles-js {
             position: fixed; width: 100%; height: 100%;
-            top: 0; left: 0; z-index: 0;
-            background-color: var(--bg-dark);
-            transition: background-color 0.5s ease;
+            top: 0; left: 0; z-index: 1;
         }
-        .content-wrapper { position: relative; z-index: 1; }
+        .content-wrapper { position: relative; z-index: 2; }
 
-        /* --- Card Styles --- */
+        /* --- Card Styles (Glassmorphism + 3D) --- */
         .page-card {
-            background-color: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 0.5rem;
+            background: var(--bg-card-glass);
+            border: 1px solid var(--border-card-glass);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px); /* Safari support */
+            border-radius: 1rem;
             opacity: 0;
-            transform: translateY(20px);
+            transform: perspective(1000px);
+            transform-style: preserve-3d;
             animation: fadeIn 0.8s forwards;
-            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease, background-color 0.5s ease;
-            position: relative; overflow: hidden;
-            box-shadow: 4px 4px 0px 0px var(--shadow-color);
+            transition: transform 0.1s linear, border-color 0.3s ease, background-color 0.5s ease;
+            position: relative;
+            overflow: hidden;
             display: flex; flex-direction: column;
         }
+        /* Remove default hover to let JS handle it */
         .page-card:hover {
-            transform: translateY(-5px) translateX(-2px);
-            box-shadow: 6px 6px 0px 0px var(--shadow-color);
-            border-color: var(--highlight-primary);
+            box-shadow: none;
         }
-        @keyframes fadeIn { to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { to { opacity: 1; transform: perspective(1000px) translateY(0); } }
 
         .highlight { color: var(--highlight-primary); }
         
@@ -113,23 +143,18 @@
             transform: translateY(-3px) scale(1.05);
             box-shadow: 0 8px 15px rgba(0,0,0,0.3);
         }
-        .sync-button:active {
-            transform: translateY(-1px) scale(1.02);
-        }
+        .sync-button:active { transform: translateY(-1px) scale(1.02); }
 
         /* --- Loader Animation --- */
         .loader-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
             padding: 4rem;
             font-family: 'Ubuntu Mono', monospace;
-            grid-column: 1 / -1; /* Span all columns */
+            grid-column: 1 / -1;
         }
         .loader-svg {
-            width: 5rem;
-            height: 5rem;
+            width: 5rem; height: 5rem;
             color: var(--highlight-primary);
         }
         .loader-svg .track { stroke: var(--border-color); }
@@ -157,10 +182,13 @@
     </style>
 </head>
 <body class="antialiased">
+    <div class="background-blobs">
+        <div class="blob1"></div>
+        <div class="blob2"></div>
+    </div>
     <div id="particles-js"></div>
 
     <div class="content-wrapper container mx-auto p-4 md:p-8 max-w-6xl">
-
         <!-- Header -->
         <header class="text-center mb-12 pt-8 sm:pt-16">
             <h1 class="text-4xl md:text-6xl font-bold">SwiftSheets</h1>
@@ -225,13 +253,13 @@
                 const title = formatTitle(page.name);
                 const description = createDescription(title);
                 const pageUrl = `https://ryudswift.github.io/swiftsheets/pages/${page.name}`;
-                const bgColor = getComputedStyle(document.documentElement).getPropertyValue('--bg-card').substring(1);
-                const textColor = getComputedStyle(document.documentElement).getPropertyValue('--highlight-primary').substring(1);
+                const bgColor = getComputedStyle(document.documentElement).getPropertyValue('--bg-card').substring(1).trim();
+                const textColor = getComputedStyle(document.documentElement).getPropertyValue('--highlight-primary').substring(1).trim();
                 const imageUrl = `https://placehold.co/600x400/${bgColor}/${textColor}?text=${encodeURIComponent(title.split(':')[0] || title)}&font=ubuntu`;
 
                 return `
                     <a href="${pageUrl}" target="_blank" rel="noopener noreferrer" class="page-card no-underline group" style="animation-delay: ${Math.random() * 0.5}s">
-                        <div class="overflow-hidden">
+                        <div class="overflow-hidden rounded-t-lg">
                             <img src="${imageUrl}" alt="Placeholder image for ${title}" class="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105">
                         </div>
                         <div class="p-6 flex flex-col flex-grow">
@@ -241,6 +269,24 @@
                         </div>
                     </a>
                 `;
+            }
+
+            function init3dCards() {
+                const cards = document.querySelectorAll('.page-card');
+                cards.forEach(card => {
+                    card.addEventListener('mousemove', (e) => {
+                        const { width, height, left, top } = card.getBoundingClientRect();
+                        const x = e.clientX - left;
+                        const y = e.clientY - top;
+                        const maxRotate = 10;
+                        const rotateX = ((y - height / 2) / (height / 2) * -maxRotate).toFixed(2);
+                        const rotateY = ((x - width / 2) / (width / 2) * maxRotate).toFixed(2);
+                        card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.05, 1.05, 1.05)`;
+                    });
+                    card.addEventListener('mouseleave', () => {
+                        card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
+                    });
+                });
             }
             
             async function loadPages() {
@@ -257,6 +303,7 @@
 
                     if (htmlFiles.length > 0) {
                         grid.innerHTML = htmlFiles.map(createPageCard).join('');
+                        init3dCards();
                         pagesLoaded = true;
                     } else {
                         grid.innerHTML = '<p class="text-muted text-center md:col-span-2 lg:col-span-3">No HTML pages found in the /pages directory.</p>';
@@ -299,7 +346,6 @@
                 currentThemeIndex = themes.indexOf(themeName);
                 loadParticles(themeName);
                 
-                // If pages are already loaded, re-render them to update card/image colors
                 if (pagesLoaded) {
                     loadPages();
                 }
@@ -313,7 +359,7 @@
 
             // --- Initial Load ---
             const savedTheme = localStorage.getItem('swiftsheets-theme') || 'theme-ubuntu';
-            setTheme(savedTheme.split(' ')[0]); // Ensure no extra classes are saved
+            setTheme(savedTheme.split(' ')[0]);
         });
     </script>
 </body>
