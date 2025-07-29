@@ -1,1 +1,287 @@
-page
+<!DOCTYPE html>
+<html lang="en" class="theme-ubuntu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SwiftSheets Index</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&family=Ubuntu+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* --- Theme Definitions --- */
+        :root {
+            /* Default Theme: Ubuntu */
+            --bg-dark: #2c001e; /* Deep Aubergine */
+            --bg-card: #3b142f;
+            --text-main: #f2f2f2;
+            --text-muted: #d9d9d9;
+            --highlight-primary: #E95420; /* Ubuntu Orange */
+            --highlight-secondary: #dd4814;
+            --border-color: #58334d;
+            --shadow-color: rgba(0,0,0,0.3);
+            --particle-color: #E95420;
+            --particle-line-color: #58334d;
+        }
+
+        .theme-pastel-terminal {
+            --bg-dark: #211F2C;
+            --bg-card: #2A2739;
+            --text-main: #EAE6FF;
+            --text-muted: #b0a9d4;
+            --highlight-primary: #A48DFA;
+            --highlight-secondary: #8DFAAF;
+            --border-color: #403d52;
+            --shadow-color: rgba(0,0,0,0.2);
+            --particle-color: #A48DFA;
+            --particle-line-color: #403d52;
+        }
+
+        .theme-light-fruity {
+            --bg-dark: #FFF9F2; /* Creamy White */
+            --bg-card: #FFFFFF;
+            --text-main: #5D4037; /* Brown */
+            --text-muted: #795548;
+            --highlight-primary: #FF7043; /* Deep Orange */
+            --highlight-secondary: #FFCA28; /* Amber */
+            --border-color: #FFCCBC;
+            --shadow-color: rgba(0,0,0,0.1);
+            --particle-color: #FF7043;
+            --particle-line-color: #FFCCBC;
+        }
+
+        /* --- Core Styles --- */
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Ubuntu', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            transition: background-color 0.5s ease, color 0.5s ease;
+        }
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Ubuntu Mono', monospace;
+        }
+
+        #particles-js {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0; left: 0;
+            z-index: 0;
+            background-color: var(--bg-dark);
+            transition: background-color 0.5s ease;
+        }
+        .content-wrapper {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Card styles */
+        .page-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeIn 0.8s forwards;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease, background-color 0.5s ease;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 4px 4px 0px 0px var(--shadow-color);
+            display: flex;
+            flex-direction: column;
+        }
+        .page-card:hover {
+            transform: translateY(-5px) translateX(-2px);
+            box-shadow: 6px 6px 0px 0px var(--shadow-color);
+            border-color: var(--highlight-primary);
+        }
+        @keyframes fadeIn { to { opacity: 1; transform: translateY(0); } }
+
+        .highlight { color: var(--highlight-primary); }
+
+        /* --- Theme Switcher FAB --- */
+        #theme-fab-container {
+            position: fixed;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            z-index: 100;
+        }
+        #theme-fab-toggle {
+            width: 3.5rem; height: 3.5rem;
+            border-radius: 50%;
+            background-color: var(--bg-card);
+            border: 2px solid var(--border-color);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        #theme-fab-toggle:hover { transform: scale(1.1) rotate(15deg); }
+        #theme-fab-icon {
+            width: 1.5rem; height: 1.5rem;
+            color: var(--highlight-primary);
+        }
+
+        .loader-container {
+            text-align: center;
+            padding: 4rem;
+            font-family: 'Ubuntu Mono', monospace;
+        }
+    </style>
+</head>
+<body class="antialiased">
+    <div id="particles-js"></div>
+
+    <div class="content-wrapper container mx-auto p-4 md:p-8 max-w-6xl">
+
+        <!-- Header -->
+        <header class="text-center mb-12 pt-8 sm:pt-16">
+            <h1 class="text-4xl md:text-6xl font-bold">SwiftSheets</h1>
+            <p class="text-lg mt-2 text-muted">An automated index of guides, tools, and notes.</p>
+        </header>
+
+        <!-- Dynamic Grid for Pages -->
+        <main id="pages-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- Loader -->
+            <div id="loader" class="loader-container md:col-span-2 lg:col-span-3">
+                <p class="text-2xl highlight">Fetching sheets...</p>
+                <p class="text-muted mt-2">Scanning the repository for pages.</p>
+            </div>
+            <!-- Page cards will be injected here by JavaScript -->
+        </main>
+
+        <footer class="text-center mt-12 py-8 text-sm text-muted">
+            <p>&copy; 2024 RyudSwift | Index is auto-generated via GitHub API.</p>
+        </footer>
+    </div>
+
+    <!-- Theme Switcher FAB -->
+    <div id="theme-fab-container">
+        <button id="theme-fab-toggle" title="Switch Theme">
+            <svg id="theme-fab-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4.098 19.902a3.75 3.75 0 005.304 0l6.401-6.402a3.75 3.75 0 00-5.304-5.304L4.098 14.6c-.39.39-.39 1.023 0 1.414l.495.495a1.875 1.875 0 010 2.652l-.495.495a1.875 1.875 0 01-2.652 0l-.495-.495a1.875 1.875 0 010-2.652l6.402-6.401a3.75 3.75 0 005.304 5.304l-6.402 6.401a3.75 3.75 0 00-5.304 0z" />
+            </svg>
+        </button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const GITHUB_REPO = 'ryudswift/swiftsheets';
+            const PAGES_DIR_API = `https://api.github.com/repos/${GITHUB_REPO}/contents/pages`;
+
+            const grid = document.getElementById('pages-grid');
+            const loader = document.getElementById('loader');
+
+            /**
+             * Formats the filename into a cleaner, more readable title.
+             * e.g., '[sys]ssh-android-laptop.html' -> 'SYS: SSH Android Laptop'
+             */
+            function formatTitle(filename) {
+                return filename
+                    .replace('.html', '')
+                    .replace(/\[(.*?)\]/g, (match, p1) => `${p1.toUpperCase()}: `) // [sys] -> SYS:
+                    .replace(/-/g, ' ') // ssh-android-laptop -> ssh android laptop
+                    .split(' ')
+                    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                    .join(' ');
+            }
+            
+            /**
+             * Creates a placeholder description from the title.
+             */
+            function createDescription(title) {
+                return `A technical guide or note on the topic of "${title}". Click to view the full page.`;
+            }
+
+            /**
+             * Creates and returns the HTML for a single page card.
+             */
+            function createPageCard(page) {
+                const title = formatTitle(page.name);
+                const description = createDescription(title);
+                const pageUrl = `https://ryudswift.github.io/swiftsheets/pages/${page.name}`;
+                // Using placehold.co for a dynamic placeholder image
+                const imageUrl = `https://placehold.co/600x400/${getComputedStyle(document.body).getPropertyValue('--bg-dark').substring(1)}/${getComputedStyle(document.body).getPropertyValue('--highlight-primary').substring(1)}?text=${encodeURIComponent(title)}&font=ubuntu`;
+
+                return `
+                    <a href="${pageUrl}" target="_blank" rel="noopener noreferrer" class="page-card no-underline group" style="animation-delay: ${Math.random() * 0.5}s">
+                        <div class="overflow-hidden">
+                            <img src="${imageUrl}" alt="Placeholder image for ${title}" class="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105">
+                        </div>
+                        <div class="p-6 flex flex-col flex-grow">
+                            <h3 class="text-xl font-bold highlight">${title}</h3>
+                            <p class="text-muted mt-2 flex-grow">${description}</p>
+                            <p class="text-sm mt-4 font-mono text-right highlight">View Sheet &rarr;</p>
+                        </div>
+                    </a>
+                `;
+            }
+            
+            /**
+             * Fetches page data from GitHub API and populates the grid.
+             */
+            async function loadPages() {
+                try {
+                    const response = await fetch(PAGES_DIR_API);
+                    if (!response.ok) {
+                        throw new Error(`GitHub API error: ${response.status}`);
+                    }
+                    const data = await response.json();
+                    const htmlFiles = data.filter(file => file.type === 'file' && file.name.endsWith('.html'));
+
+                    if (htmlFiles.length > 0) {
+                        grid.innerHTML = htmlFiles.map(createPageCard).join('');
+                    } else {
+                        grid.innerHTML = '<p class="text-muted text-center md:col-span-2 lg:col-span-3">No HTML pages found in the /pages directory.</p>';
+                    }
+                } catch (error) {
+                    console.error("Failed to load pages:", error);
+                    grid.innerHTML = `<p class="text-red-400 text-center md:col-span-2 lg:col-span-3">Error fetching sheets. Check the console for details.</p>`;
+                } finally {
+                    if (loader) loader.remove();
+                }
+            }
+
+            // --- Theme Management ---
+            const themes = ['theme-ubuntu', 'theme-pastel-terminal', 'theme-light-fruity'];
+            const themeData = {
+                'theme-ubuntu': { particleColor: '#E95420', lineColor: '#58334d' },
+                'theme-pastel-terminal': { particleColor: '#A48DFA', lineColor: '#403d52' },
+                'theme-light-fruity': { particleColor: '#FF7043', lineColor: '#FFCCBC' },
+            };
+            let currentThemeIndex = 0;
+
+            function loadParticles(theme) {
+                if (window.pJSDom && window.pJSDom.length > 0) {
+                    window.pJSDom[0].pJS.fn.vendors.destroypJS();
+                    window.pJSDom = [];
+                }
+                particlesJS('particles-js', {
+                    "particles": { "number": { "value": 50, "density": { "enable": true, "value_area": 800 } }, "color": { "value": themeData[theme].particleColor }, "shape": { "type": "circle" }, "opacity": { "value": 0.5, "random": false }, "size": { "value": 3, "random": true }, "line_linked": { "enable": true, "distance": 150, "color": themeData[theme].lineColor, "opacity": 0.4, "width": 1 }, "move": { "enable": true, "speed": 1, "direction": "none", "out_mode": "out" } }, "interactivity": { "detect_on": "canvas", "events": { "onhover": { "enable": true, "mode": "grab" }, "onclick": { "enable": false } } }, "retina_detect": true
+                });
+            }
+
+            function setTheme(themeName) {
+                document.documentElement.className = themeName;
+                localStorage.setItem('swiftsheets-theme', themeName);
+                currentThemeIndex = themes.indexOf(themeName);
+                loadParticles(themeName);
+                // Reload pages to update placeholder image colors
+                if (!loader) loadPages(); 
+            }
+
+            document.getElementById('theme-fab-toggle').addEventListener('click', () => {
+                currentThemeIndex = (currentThemeIndex + 1) % themes.length;
+                const nextTheme = themes[currentThemeIndex];
+                setTheme(nextTheme);
+            });
+
+            // --- Initial Load ---
+            const savedTheme = localStorage.getItem('swiftsheets-theme') || 'theme-ubuntu';
+            setTheme(savedTheme); // This will also call loadParticles and loadPages
+        });
+    </script>
+</body>
+</html>
