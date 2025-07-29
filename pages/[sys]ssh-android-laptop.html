@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en" class="theme-ubuntu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Remote Access Guide | SSH & RustDesk</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&family=Ubuntu+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* --- Theme Definitions --- */
+        :root {
+            /* Default Theme: Ubuntu */
+            --bg-dark: #2c001e; /* Deep Aubergine */
+            --bg-card: #3b142f;
+            --text-main: #f2f2f2;
+            --text-muted: #d9d9d9;
+            --highlight-primary: #E95420; /* Ubuntu Orange */
+            --highlight-secondary: #dd4814;
+            --border-color: #58334d;
+            --shadow-color: rgba(0,0,0,0.3);
+            --particle-color: #E95420;
+            --particle-line-color: #58334d;
+            --code-bg: #211f2c;
+        }
+
+        .theme-pastel-terminal {
+            --bg-dark: #211F2C;
+            --bg-card: #2A2739;
+            --text-main: #EAE6FF;
+            --text-muted: #b0a9d4;
+            --highlight-primary: #A48DFA;
+            --highlight-secondary: #8DFAAF;
+            --border-color: #403d52;
+            --shadow-color: rgba(0,0,0,0.2);
+            --particle-color: #A48DFA;
+            --particle-line-color: #403d52;
+            --code-bg: #1e1c2a;
+        }
+
+        .theme-pastel-light {
+            --bg-dark: #F4F1FF;
+            --bg-card: #FFFFFF;
+            --text-main: #2C2A3A;
+            --text-muted: #5e5a7b;
+            --highlight-primary: #8A6DFF;
+            --highlight-secondary: #00C6AE;
+            --border-color: #e0d9ff;
+            --shadow-color: rgba(0,0,0,0.1);
+            --particle-color: #8A6DFF;
+            --particle-line-color: #d1c6ff;
+            --code-bg: #eaeaef;
+        }
+
+        .theme-fruity-catppuccin {
+            --bg-dark: #1E1E2E;
+            --bg-card: #181825;
+            --text-main: #CDD6F4;
+            --text-muted: #A6ADC8;
+            --highlight-primary: #F5C2E7;
+            --highlight-secondary: #A6E3A1;
+            --border-color: #313244;
+            --shadow-color: rgba(0,0,0,0.2);
+            --particle-color: #F5C2E7;
+            --particle-line-color: #45475A;
+            --code-bg: #11111b;
+        }
+
+        /* --- Core Styles --- */
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Ubuntu', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            transition: background-color 0.5s ease, color 0.5s ease;
+        }
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Ubuntu Mono', monospace;
+        }
+
+        #particles-js {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0; left: 0;
+            z-index: 0;
+            background-color: var(--bg-dark);
+            transition: background-color 0.5s ease;
+        }
+        .content-wrapper {
+            position: relative;
+            z-index: 1;
+        }
+        .animated-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeIn 0.8s forwards;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease, background-color 0.5s ease;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 4px 4px 0px 0px var(--shadow-color);
+        }
+        .animated-card:hover {
+            transform: translateY(-5px) translateX(-2px);
+            box-shadow: 6px 6px 0px 0px var(--shadow-color);
+            border-color: var(--highlight-primary);
+        }
+        main > .animated-card { animation-delay: 0.2s; }
+        main > .space-y-8 > .animated-card:nth-of-type(2) { animation-delay: 0.4s; }
+        main > .space-y-8 > .animated-card:nth-of-type(3) { animation-delay: 0.6s; }
+        main > .space-y-8 > .animated-card:nth-of-type(4) { animation-delay: 0.8s; }
+
+        @keyframes fadeIn { to { opacity: 1; transform: translateY(0); } }
+
+        .icon {
+            font-size: 1.5rem;
+            margin-right: 0.75rem;
+            color: var(--highlight-secondary);
+            transition: color 0.5s ease;
+        }
+        .highlight {
+            color: var(--highlight-primary);
+            font-weight: 700;
+            transition: color 0.5s ease;
+        }
+        
+        pre {
+            background-color: var(--code-bg);
+            color: var(--text-muted);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border-color);
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-family: 'Ubuntu Mono', monospace;
+            transition: background-color 0.5s ease, border-color 0.5s ease;
+        }
+
+        /* --- Theme Switcher FAB --- */
+        #theme-fab-container {
+            position: fixed;
+            top: 50%;
+            right: 1.5rem;
+            transform: translateY(-50%);
+            z-index: 100;
+        }
+        #theme-fab-toggle {
+            width: 3.5rem; height: 3.5rem;
+            border-radius: 50%;
+            background-color: var(--bg-card);
+            border: 2px solid var(--border-color);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
+            transition: transform 0.3s ease, background-color 0.5s ease;
+        }
+        #theme-fab-toggle:hover { transform: scale(1.1); }
+        #theme-fab-container.open #theme-fab-toggle { transform: rotate(45deg); }
+        #theme-fab-icon {
+            width: 1.5rem; height: 1.5rem;
+            color: var(--highlight-primary);
+            transition: color 0.5s ease;
+        }
+        #theme-fab-options {
+            position: absolute; top: 50%; right: 0;
+            width: 3.5rem; height: 3.5rem;
+            transform: translateY(-50%);
+            pointer-events: none;
+        }
+        #theme-fab-container.open #theme-fab-options { pointer-events: auto; }
+        .theme-button {
+            position: absolute; top: 50%; right: 0;
+            width: 2.5rem; height: 2.5rem;
+            margin-top: -1.25rem;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid var(--bg-dark);
+            transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transform-origin: center right;
+            opacity: 0;
+        }
+        #theme-fab-container.open .theme-button { opacity: 1; }
+        #theme-fab-container.open .theme-button:nth-child(1) { transform: translateY(-3.5rem); transition-delay: 0.0s; }
+        #theme-fab-container.open .theme-button:nth-child(2) { transform: translateY(-6.5rem); transition-delay: 0.1s; }
+        #theme-fab-container.open .theme-button:nth-child(3) { transform: translateY(-9.5rem); transition-delay: 0.2s; }
+        .theme-button.active {
+            transform: scale(1.2) !important;
+            border-color: var(--highlight-secondary);
+        }
+        #theme-ubuntu { background-color: #2c001e; }
+        #theme-pastel-terminal { background-color: #211F2C; }
+        #theme-pastel-light { background-color: #F4F1FF; }
+        #theme-fruity-catppuccin { background-color: #1E1E2E; }
+
+    </style>
+</head>
+<body class="antialiased">
+    <div id="particles-js"></div>
+
+    <div class="content-wrapper container mx-auto p-4 md:p-8 max-w-4xl">
+
+        <!-- Header -->
+        <header class="text-center mb-12 pt-16">
+            <h1 class="text-4xl md:text-5xl font-bold">Secure Remote Access Guide 🛡️</h1>
+            <p class="text-lg mt-2 text-muted">SSH & RustDesk Setup for Bodhi Linux & Termux</p>
+        </header>
+
+        <main class="space-y-8">
+            <!-- Part 1: SSH Intro -->
+            <section class="animated-card">
+                <h2 class="text-3xl font-bold mb-4 flex items-center"><span class="icon">💻</span>Part 1: Secure Shell (SSH)</h2>
+                <p class="leading-relaxed text-muted">
+                    First, we'll set up SSH with key-based authentication. This provides a <span class="highlight">highly secure</span> command-line interface to your laptop from anywhere. It's faster and more secure than using passwords.
+                </p>
+            </section>
+            
+            <!-- Step 1.1: On Your Laptop -->
+            <div class="animated-card">
+                <h3 class="text-2xl font-bold mb-4 flex items-center"><span class="icon">🐧</span>On Your Bodhi Linux Laptop</h3>
+                <div class="space-y-4">
+                    <div>
+                        <h4 class="font-semibold text-lg highlight">1. Install OpenSSH Server</h4>
+                        <p class="text-muted mb-2">Open your terminal and run these commands to install the server software.</p>
+                        <pre><code>sudo apt update
+sudo apt install openssh-server</code></pre>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-lg highlight">2. Start & Enable the Service</h4>
+                        <p class="text-muted mb-2">This ensures the SSH server runs automatically on boot.</p>
+                        <pre><code>sudo systemctl start sshd
+sudo systemctl enable sshd</code></pre>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-lg highlight">3. Find Your Laptop's IP Address</h4>
+                        <p class="text-muted mb-2">You'll need this to connect from your phone. Look for the address next to `inet` under `wlan0` or `eth0`.</p>
+                        <pre><code>ip a</code></pre>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 1.2: On Your Phone -->
+            <div class="animated-card">
+                <h3 class="text-2xl font-bold mb-4 flex items-center"><span class="icon">📱</span>On Your Android Phone (Termux)</h3>
+                <div class="space-y-4">
+                    <div>
+                        <h4 class="font-semibold text-lg highlight">1. Install SSH Client</h4>
+                        <p class="text-muted mb-2">Open Termux and install the OpenSSH package.</p>
+                        <pre><code>pkg install openssh</code></pre>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-lg highlight">2. Generate Your SSH Key</h4>
+                        <p class="text-muted mb-2">This creates your secure key pair. Press Enter for all prompts to accept defaults.</p>
+                        <pre><code>ssh-keygen -t ed25519</code></pre>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-lg highlight">3. Copy Key to Laptop</h4>
+                        <p class="text-muted mb-2">This command securely authorizes your phone. Replace `your_user` and `laptop_ip_address` with your info. You'll enter your laptop password one last time.</p>
+                        <pre><code>ssh-copy-id your_user@laptop_ip_address</code></pre>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Step 1.3: Final Security -->
+            <div class="animated-card">
+                <h3 class="text-2xl font-bold mb-4 flex items-center"><span class="icon">🔒</span>Final Security Step (On Laptop)</h3>
+                 <p class="text-muted mb-4">For maximum security, let's disable password logins entirely, forcing the use of your SSH key.</p>
+                 <div class="space-y-4">
+                    <div>
+                        <h4 class="font-semibold text-lg highlight">1. Edit SSH Config</h4>
+                        <p class="text-muted mb-2">Open the configuration file with a text editor.</p>
+                        <pre><code>sudo nano /etc/ssh/sshd_config</code></pre>
+                    </div>
+                     <div>
+                        <p class="text-muted mb-2">Find the line `#PasswordAuthentication yes` or `PasswordAuthentication yes`. Remove the `#` if present and change `yes` to `no`.</p>
+                         <p class="font-semibold text-lg highlight">Change to: `PasswordAuthentication no`</p>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-lg highlight">2. Restart SSH Service</h4>
+                        <p class="text-muted mb-2">Apply the changes by restarting the service.</p>
+                        <pre><code>sudo systemctl restart sshd</code></pre>
+                    </div>
+                     <div>
+                        <h4 class="font-semibold text-lg highlight text-green-400">✅ SSH Setup Complete!</h4>
+                        <p class="text-muted mb-2">From Termux, you can now connect with:</p>
+                        <pre><code>ssh your_user@laptop_ip_address</code></pre>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Part 2: RustDesk Intro -->
+            <section class="animated-card mt-16">
+                <h2 class="text-3xl font-bold mb-4 flex items-center"><span class="icon">🖼️</span>Part 2: RustDesk (Graphical UI)</h2>
+                <p class="leading-relaxed text-muted">
+                    Now, for full graphical control of your i3wm desktop, we'll use RustDesk. It's a secure, open-source remote desktop solution that's easy to set up.
+                </p>
+            </section>
+
+            <!-- Step 2.1: RustDesk Setup -->
+            <div class="animated-card">
+                 <h3 class="text-2xl font-bold mb-4 flex items-center"><span class="icon">🚀</span>RustDesk Setup</h3>
+                 <div class="space-y-6">
+                    <div>
+                        <h4 class="font-semibold text-lg highlight">1. Install on Laptop</h4>
+                        <p class="text-muted mb-2">Go to the <a href="https://rustdesk.com/" target="_blank" rel="noopener noreferrer" class="font-bold underline">RustDesk website</a>, download the `.deb` file, and install it from your terminal.</p>
+                        <pre><code>cd ~/Downloads
+sudo apt install ./rustdesk-*.deb</code></pre>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-lg highlight">2. Install on Phone</h4>
+                        <p class="text-muted mb-2">Get the RustDesk app from the <a href="https://play.google.com/store/apps/details?id=com.carriez.flutter_hbb" target="_blank" rel="noopener noreferrer" class="font-bold underline">Google Play Store</a> or F-Droid.</p>
+                    </div>
+                     <div>
+                        <h4 class="font-semibold text-lg highlight text-green-400">3. Connect!</h4>
+                        <p class="text-muted mb-2">Open RustDesk on both devices. On your phone, enter the <span class="highlight">ID</span> and one-time <span class="highlight">Password</span> shown on your laptop's RustDesk window to connect.</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer class="text-center mt-12 text-sm text-muted">
+            <p>&copy; 2024 Remote Access Guide. Built with inspiration from RyudSwift.</p>
+        </footer>
+    </div>
+
+    <!-- Theme Switcher FAB -->
+    <div id="theme-fab-container">
+        <div id="theme-fab-options">
+            <button id="theme-ubuntu" class="theme-button" data-theme="theme-ubuntu" title="Ubuntu"></button>
+            <button id="theme-pastel-terminal" class="theme-button" data-theme="theme-pastel-terminal" title="Pastel Terminal"></button>
+            <button id="theme-fruity-catppuccin" class="theme-button" data-theme="theme-fruity-catppuccin" title="Fruity Catppuccin"></button>
+            <button id="theme-pastel-light" class="theme-button" data-theme="theme-pastel-light" title="Pastel Light"></button>
+        </div>
+        <button id="theme-fab-toggle">
+            <svg id="theme-fab-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9.53 16.122a3 3 0 00-3.48-2.146l-3.091.732a3 3 0 00-2.81 2.81l.732 3.091a3 3 0 002.146 3.48l3.091-.732a3 3 0 002.81-2.81l-.732-3.091zM9.53 16.122L15.25 10.4l-4.869-4.869L4.75 10.4l4.78 5.722zM15.25 10.4a3 3 0 01-4.242 0l-4.869-4.869a3 3 0 010-4.242l4.869 4.869 4.242 0z" />
+            </svg>
+        </button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const themes = {
+                'theme-ubuntu': { particleColor: '#E95420', lineColor: '#58334d' },
+                'theme-pastel-terminal': { particleColor: '#A48DFA', lineColor: '#403d52' },
+                'theme-pastel-light': { particleColor: '#8A6DFF', lineColor: '#d1c6ff' },
+                'theme-fruity-catppuccin': { particleColor: '#F5C2E7', lineColor: '#45475A' }
+            };
+
+            function loadParticles(theme) {
+                if (window.pJSDom && window.pJSDom.length > 0) {
+                    window.pJSDom[0].pJS.fn.vendors.destroypJS();
+                    window.pJSDom = [];
+                }
+                
+                particlesJS('particles-js', {
+                    "particles": {
+                        "number": { "value": 80, "density": { "enable": true, "value_area": 800 } },
+                        "color": { "value": themes[theme].particleColor },
+                        "shape": { "type": "circle" },
+                        "opacity": { "value": 0.5, "random": true },
+                        "size": { "value": 3, "random": true },
+                        "line_linked": { "enable": true, "distance": 150, "color": themes[theme].lineColor, "opacity": 0.4, "width": 1.5 },
+                        "move": { "enable": true, "speed": 1.5, "direction": "none", "out_mode": "out" }
+                    },
+                    "interactivity": { "detect_on": "canvas", "events": { "onhover": { "enable": true, "mode": "grab" }, "onclick": { "enable": false }, "resize": true }, "modes": { "grab": { "distance": 150, "line_linked": { "opacity": 0.7 } } } },
+                    "retina_detect": true
+                });
+            }
+            
+            function setTheme(themeName) {
+                document.documentElement.className = themeName;
+                localStorage.setItem('remote-access-guide-theme', themeName);
+
+                document.querySelectorAll('.theme-button').forEach(btn => {
+                    btn.classList.toggle('active', btn.dataset.theme === themeName);
+                });
+                
+                loadParticles(themeName);
+            }
+
+            // --- Theme Switcher Logic ---
+            const fabContainer = document.getElementById('theme-fab-container');
+            const fabToggle = document.getElementById('theme-fab-toggle');
+            fabToggle.addEventListener('click', () => {
+                fabContainer.classList.toggle('open');
+            });
+
+            document.querySelectorAll('.theme-button').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    setTheme(e.target.dataset.theme);
+                    fabContainer.classList.remove('open');
+                });
+            });
+
+            let savedTheme = localStorage.getItem('remote-access-guide-theme') || 'theme-ubuntu';
+            setTheme(savedTheme);
+        });
+    </script>
+</body>
+</html>
