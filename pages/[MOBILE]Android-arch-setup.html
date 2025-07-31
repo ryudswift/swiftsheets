@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Action Plan: Arch Linux GUI on Android</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Custom scrollbar for a cleaner look */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        .dark ::-webkit-scrollbar-track {
+            background: #1e293b;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #94a3b8;
+            border-radius: 10px;
+        }
+        .dark ::-webkit-scrollbar-thumb {
+            background: #475569;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+        .dark ::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+        }
+        /* Styling for the details/summary accordion */
+        details > summary {
+            list-style: none;
+        }
+        details > summary::-webkit-details-marker {
+            display: none;
+        }
+        details .summary-icon {
+            transition: transform 0.2s ease-in-out;
+        }
+        details[open] .summary-icon {
+            transform: rotate(90deg);
+        }
+        /* Custom checkbox style */
+        .task-checkbox:checked {
+            background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z'/%3e%3c/svg%3e");
+        }
+    </style>
+</head>
+<body class="bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-slate-200 transition-colors duration-300">
+
+    <div class="max-w-4xl mx-auto p-4 sm:p-6 md:p-8">
+        
+        <!-- Header -->
+        <header class="flex justify-between items-center mb-6">
+            <div>
+                <h1 class="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">Arch Linux GUI Plan</h1>
+                <p class="text-sm text-slate-500 dark:text-slate-400">v0.01</p>
+            </div>
+            <button id="theme-toggle" class="p-2 rounded-full text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-100 dark:focus:ring-offset-slate-900 focus:ring-sky-500">
+                <svg id="theme-icon-light" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                <svg id="theme-icon-dark" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+            </button>
+        </header>
+
+        <!-- Progress Bar -->
+        <div class="mb-8">
+            <div class="flex justify-between mb-1">
+                <span class="text-base font-medium text-sky-700 dark:text-white">Progress</span>
+                <span id="progress-text" class="text-sm font-medium text-sky-700 dark:text-white">0%</span>
+            </div>
+            <div class="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2.5">
+                <div id="progress-bar" class="bg-sky-600 h-2.5 rounded-full transition-all duration-300" style="width: 0%"></div>
+            </div>
+        </div>
+
+        <!-- Action Plan Sections -->
+        <div class="space-y-4">
+            
+            <!-- Phase 1 -->
+            <details class="bg-white dark:bg-slate-800/50 rounded-lg shadow-sm overflow-hidden" open>
+                <summary class="flex items-center justify-between p-4 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800">
+                    <h2 class="text-lg font-semibold text-slate-900 dark:text-white">Phase 1: Base Arch Linux Setup</h2>
+                    <svg class="summary-icon h-5 w-5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                </summary>
+                <div class="p-4 border-t border-slate-200 dark:border-slate-700">
+                    <ul class="space-y-4">
+                        <li class="task-item"><label class="flex items-start"><input type="checkbox" class="task-checkbox mt-1 h-5 w-5 rounded border-slate-300 dark:border-slate-600 text-sky-600 bg-white dark:bg-slate-900 focus:ring-sky-500"><span class="ml-3 text-slate-600 dark:text-slate-300"><strong>Update Termux:</strong> Open Termux and run the command.</span></label><div class="code-block" data-code="pkg update && pkg upgrade -y"></div></li>
+                        <li class="task-item"><label class="flex items-start"><input type="checkbox" class="task-checkbox mt-1 h-5 w-5 rounded border-slate-300 dark:border-slate-600 text-sky-600 bg-white dark:bg-slate-900 focus:ring-sky-500"><span class="ml-3 text-slate-600 dark:text-slate-300"><strong>Install `proot-distro`:</strong> This tool manages Linux distributions.</span></label><div class="code-block" data-code="pkg install proot-distro -y"></div></li>
+                        <li class="task-item"><label class="flex items-start"><input type="checkbox" class="task-checkbox mt-1 h-5 w-5 rounded border-slate-300 dark:border-slate-600 text-sky-600 bg-white dark:bg-slate-900 focus:ring-sky-500"><span class="ml-3 text-slate-600 dark:text-slate-300"><strong>Install Arch Linux:</strong> Use `proot-distro` to download and install Arch.</span></label><div class="code-block" data-code="proot-distro install archlinux"></div></li>
+                        <li class="task-item"><label class="flex items-start"><input type="checkbox" class="task-checkbox mt-1 h-5 w-5 rounded border-slate-300 dark:border-slate-600 text-sky-600 bg-white dark:bg-slate-900 focus:ring-sky-500"><span class="ml-3 text-slate-600 dark:text-slate-300"><strong>Log into Arch Linux:</strong> Your command prompt will change.</span></label><div class="code-block" data-code="proot-distro login archlinux"></div></li>
+                    </ul>
+                </div>
+            </details>
+
+            <!-- Phase 2 -->
+            <details class="bg-white dark:bg-slate-800/50 rounded-lg shadow-sm overflow-hidden">
+                <summary class="flex items-center justify-between p-4 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800">
+                    <h2 class="text-lg font-semibold text-slate-900 dark:text-white">Phase 2: User & Sudo Configuration</h2>
+                    <svg class="summary-icon h-5 w-5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                </summary>
+                <div class="p-4 border-t border-slate-200 dark:border-slate-700">
+                    <ul class="space-y-4">
+                        <li class="task-item"><label class="flex items-start"><input type="checkbox" class="task-checkbox mt-1 h-5 w-5 rounded border-slate-300 dark:border-slate-600 text-sky-600 bg-white dark:bg-slate-900 focus:ring-sky-500"><span class="ml-3 text-slate-600 dark:text-slate-300"><strong>Set Root Password:</strong> Enter a new password for the `root` user.</span></label><div class="code-block" data-code="passwd"></div></li>
+                        <li class="task-item"><label class="flex items-start"><input type="checkbox" class="task-checkbox mt-1 h-5 w-5 rounded border-slate-300 dark:border-slate-600 text-sky-600 bg-white dark:bg-slate-900 focus:ring-sky-500"><span class="ml-3 text-slate-600 dark:text-slate-300"><strong>Create a New User:</strong> Replace `your_username` with your desired name.</span></label><div class="code-block" data-code="useradd -m -G wheel -s /bin/bash your_username"></div></li>
+                        <li class="task-item"><label class="flex items-start"><input type="checkbox" class="task-checkbox mt-1 h-5 w-5 rounded border-slate-300 dark:border-slate-600 text-sky-600 bg-white dark:bg-slate-900 focus:ring-sky-500"><span class="ml-3 text-slate-600 dark:text-slate-300"><strong>Set New User's Password.</strong></span></label><div class="code-block" data-code="passwd your_username"></div></li>
+                        <li class="task-item"><label class="flex items-start"><input type="checkbox" class="task-checkbox mt-1 h-5 w-5 rounded border-slate-300 dark:border-slate-600 text-sky-600 bg-white dark:bg-slate-900 focus:ring-sky-500"><span class="ml-3 text-slate-600 dark:text-slate-300"><strong>Install `sudo` and `nano`.</strong></span></label><div class="code-block" data-code="pacman -S sudo nano"></div></li>
+                        <li class="task-item"><label class="flex items-start"><input type="checkbox" class="task-checkbox mt-1 h-5 w-5 rounded border-slate-300 dark:border-slate-600 text-sky-600 bg-white dark:bg-slate-900 focus:ring-sky-500"><span class="ml-3 text-slate-600 dark:text-slate-300"><strong>Configure `sudo` Permissions:</strong> Run `visudo`, find the line `# %wheel ALL=(ALL:ALL) ALL`, and remove the `#`. Save and exit.</span></label><div class="code-block" data-code="EDITOR=nano visudo"></div></li>
+                        <li class="task-item"><label class="flex items-start"><input type="checkbox" class="task-checkbox mt-1 h-5 w-5 rounded border-slate-300 dark:border-slate-600 text-sky-600 bg-white dark:bg-slate-900 focus:ring-sky-500"><span class="ml-3 text-slate-600 dark:text-slate-300"><strong>Switch to Your New User.</strong></span></label><div class="code-block" data-code="su - your_username"></div></li>
+                    </ul>
+                </div>
+            </details>
+
+            <!-- Phase 3 -->
+            <details class="bg-white dark:bg-slate-800/50 rounded-lg shadow-sm overflow-hidden">
+                <summary class="flex items-center justify-between p-4 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800">
+                    <h2 class="text-lg font-semibold text-slate-900 dark:text-white">Phase 3: GUI & VNC Installation</h2>
+                    <svg class="summary-icon h-5 w-5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                </summary>
+                <div class="p-4 border-t border-slate-200 dark:border-slate-700">
+                    <ul class="space-y-4">
+                        <li class="task-item"><label class="flex items-start"><input type="checkbox" class="task-checkbox mt-1 h-5 w-5 rounded border-slate-300 dark:border-slate-600 text-sky-600 bg-white dark:bg-slate-900 focus:ring-sky-500"><span class="ml-3 text-slate-600 dark:text-slate-300"><strong>Update Arch Linux:</strong> As your new user, run:</span></label><div class="code-block" data-code="sudo pacman -Syu"></div></li>
+                        <li class="task-item"><label class="flex items-start"><input type="checkbox" class="task-checkbox mt-1 h-5 w-5 rounded border-slate-300 dark:border-slate-600 text-sky-600 bg-white dark:bg-slate-900 focus:ring-sky-500"><span class="ml-3 text-slate-600 dark:text-slate-300"><strong>Install XFCE Desktop & VNC Server.</strong></span></label><div class="code-block" data-code="sudo pacman -S xfce4 tigervnc"></div></li>
+                    </ul>
+                </div>
+            </details>
+
+            <!-- Phase 4 -->
+            <details class="bg-white dark:bg-slate-800/50 rounded-lg shadow-sm overflow-hidden">
+                <summary class="flex items-center justify-between p-4 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800">
+                    <h2 class="text-lg font-semibold text-slate-900 dark:text-white">Phase 4: VNC Configuration</h2>
+                    <svg class="summary-icon h-5 w-5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                </summary>
+                <div class="p-4 border-t border-slate-200 dark:border-slate-700">
+                    <ul class="space-y-4">
+                        <li class="task-item"><label class="flex items-start"><input type="checkbox" class="task-checkbox mt-1 h-5 w-5 rounded border-slate-300 dark:border-slate-600 text-sky-600 bg-white dark:bg-slate-900 focus:ring-sky-500"><span class="ml-3 text-slate-600 dark:text-slate-300"><strong>Run `vncserver` once:</strong> This creates config files and prompts for a VNC password.</span></label><div class="code-block" data-code="vncserver"></div></li>
+                        <li class="task-item"><label class="flex items-start"><input type="checkbox" class="task-checkbox mt-1 h-5 w-5 rounded border-slate-300 dark:border-slate-600 text-sky-600 bg-white dark:bg-slate-900 focus:ring-sky-500"><span class="ml-3 text-slate-600 dark:text-slate-300"><strong>Kill the initial VNC session.</strong></span></label><div class="code-block" data-code="vncserver -kill :1"></div></li>
+                        <li class="task-item"><label class="flex items-start"><input type="checkbox" class="task-checkbox mt-1 h-5 w-5 rounded border-slate-300 dark:border-slate-600 text-sky-600 bg-white dark:bg-slate-900 focus:ring-sky-500"><span class="ml-3 text-slate-600 dark:text-slate-300"><strong>Edit the `xstartup` file:</strong> Delete all existing text and replace it with the new content.</span></label><div class="code-block" data-code="nano ~/.vnc/xstartup" data-multiline="#!/bin/sh\nunset SESSION_MANAGER\nunset DBUS_SESSION_BUS_ADDRESS\nexport XDG_CURRENT_DESKTOP=&quot;XFCE&quot;\nexec startxfce4"></div></li>
+                        <li class="task-item"><label class="flex items-start"><input type="checkbox" class="task-checkbox mt-1 h-5 w-5 rounded border-slate-300 dark:border-slate-600 text-sky-600 bg-white dark:bg-slate-900 focus:ring-sky-500"><span class="ml-3 text-slate-600 dark:text-slate-300"><strong>Make `xstartup` executable.</strong></span></label><div class="code-block" data-code="chmod +x ~/.vnc/xstartup"></div></li>
+                    </ul>
+                </div>
+            </details>
+
+            <!-- Phase 5 -->
+            <details class="bg-white dark:bg-slate-800/50 rounded-lg shadow-sm overflow-hidden">
+                <summary class="flex items-center justify-between p-4 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800">
+                    <h2 class="text-lg font-semibold text-slate-900 dark:text-white">Phase 5: Launch and Connect</h2>
+                    <svg class="summary-icon h-5 w-5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                </summary>
+                <div class="p-4 border-t border-slate-200 dark:border-slate-700">
+                    <ul class="space-y-4">
+                        <li class="task-item"><label class="flex items-start"><input type="checkbox" class="task-checkbox mt-1 h-5 w-5 rounded border-slate-300 dark:border-slate-600 text-sky-600 bg-white dark:bg-slate-900 focus:ring-sky-500"><span class="ml-3 text-slate-600 dark:text-slate-300"><strong>Start the VNC Server.</strong></span></label><div class="code-block" data-code="vncserver :1 -localhost"></div></li>
+                        <li class="task-item"><label class="flex items-start"><input type="checkbox" class="task-checkbox mt-1 h-5 w-5 rounded border-slate-300 dark:border-slate-600 text-sky-600 bg-white dark:bg-slate-900 focus:ring-sky-500"><span class="ml-3 text-slate-600 dark:text-slate-300"><strong>Install a VNC Viewer App:</strong> Get a client like **AVNC** from F-Droid or the Play Store.</span></label></li>
+                        <li class="task-item"><label class="flex items-start"><input type="checkbox" class="task-checkbox mt-1 h-5 w-5 rounded border-slate-300 dark:border-slate-600 text-sky-600 bg-white dark:bg-slate-900 focus:ring-sky-500"><span class="ml-3 text-slate-600 dark:text-slate-300"><strong>Configure VNC Viewer Connection:</strong> Set the address to `localhost:5901`.</span></label></li>
+                        <li class="task-item"><label class="flex items-start"><input type="checkbox" class="task-checkbox mt-1 h-5 w-5 rounded border-slate-300 dark:border-slate-600 text-sky-600 bg-white dark:bg-slate-900 focus:ring-sky-500"><span class="ml-3 text-slate-600 dark:text-slate-300"><strong>Connect:</strong> Use the VNC password you set in Phase 4.</span></label></li>
+                    </ul>
+                </div>
+            </details>
+
+            <!-- Phase 6 -->
+            <details class="bg-white dark:bg-slate-800/50 rounded-lg shadow-sm overflow-hidden">
+                <summary class="flex items-center justify-between p-4 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800">
+                    <h2 class="text-lg font-semibold text-slate-900 dark:text-white">Phase 6: Post-Installation (Recommended)</h2>
+                    <svg class="summary-icon h-5 w-5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                </summary>
+                <div class="p-4 border-t border-slate-200 dark:border-slate-700">
+                    <ul class="space-y-4">
+                        <li class="task-item"><label class="flex items-start"><input type="checkbox" class="task-checkbox mt-1 h-5 w-5 rounded border-slate-300 dark:border-slate-600 text-sky-600 bg-white dark:bg-slate-900 focus:ring-sky-500"><span class="ml-3 text-slate-600 dark:text-slate-300"><strong>Install a Web Browser.</strong></span></label><div class="code-block" data-code="sudo pacman -S firefox"></div></li>
+                        <li class="task-item"><label class="flex items-start"><input type="checkbox" class="task-checkbox mt-1 h-5 w-5 rounded border-slate-300 dark:border-slate-600 text-sky-600 bg-white dark:bg-slate-900 focus:ring-sky-500"><span class="ml-3 text-slate-600 dark:text-slate-300"><strong>Install a Better Terminal.</strong></span></label><div class="code-block" data-code="sudo pacman -S xfce4-terminal"></div></li>
+                    </ul>
+                </div>
+            </details>
+
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- Elements ---
+            const progressBar = document.getElementById('progress-bar');
+            const progressText = document.getElementById('progress-text');
+            const checkboxes = document.querySelectorAll('.task-checkbox');
+            const totalTasks = checkboxes.length;
+            const themeToggle = document.getElementById('theme-toggle');
+            const themeIconLight = document.getElementById('theme-icon-light');
+            const themeIconDark = document.getElementById('theme-icon-dark');
+
+            // --- Functions ---
+            
+            // Function to update the progress bar
+            function updateProgress() {
+                const checkedTasks = document.querySelectorAll('.task-checkbox:checked').length;
+                const percentage = totalTasks > 0 ? Math.round((checkedTasks / totalTasks) * 100) : 0;
+                progressBar.style.width = `${percentage}%`;
+                progressText.textContent = `${percentage}%`;
+            }
+
+            // ** NEW THEME LOGIC **
+            // Function to apply the theme and update the icon
+            function applyTheme(theme) {
+                if (theme === 'dark') {
+                    document.documentElement.classList.add('dark');
+                    themeIconLight.classList.add('hidden');
+                    themeIconDark.classList.remove('hidden');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                    themeIconLight.classList.remove('hidden');
+                    themeIconDark.classList.add('hidden');
+                }
+            }
+
+            // Function to handle the theme toggle button click
+            function handleThemeToggle() {
+                // Check the current theme by looking for the 'dark' class
+                const isCurrentlyDark = document.documentElement.classList.contains('dark');
+                // Determine the new theme
+                const newTheme = isCurrentlyDark ? 'light' : 'dark';
+                // Apply the new theme
+                applyTheme(newTheme);
+                // Save the user's preference to local storage
+                localStorage.setItem('theme', newTheme);
+            }
+
+            // Function to initialize the theme when the page loads
+            function initializeTheme() {
+                // Check for a saved theme in local storage
+                const savedTheme = localStorage.getItem('theme');
+                // Check for the user's OS preference
+                const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                
+                let currentTheme;
+                if (savedTheme) {
+                    // If a theme is saved, use it
+                    currentTheme = savedTheme;
+                } else {
+                    // Otherwise, use the system preference
+                    currentTheme = systemPrefersDark ? 'dark' : 'light';
+                }
+                // Apply the determined theme
+                applyTheme(currentTheme);
+            }
+            
+            // Function to create and inject code blocks with copy buttons
+            function setupCodeBlocks() {
+                document.querySelectorAll('.code-block').forEach(block => {
+                    const code = block.dataset.code;
+                    const multilineContent = block.dataset.multiline;
+                    
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'relative mt-2';
+                    
+                    const pre = document.createElement('pre');
+                    pre.className = 'bg-slate-100 dark:bg-slate-900 text-slate-700 dark:text-slate-300 p-3 rounded-md text-sm overflow-x-auto';
+                    
+                    const codeEl = document.createElement('code');
+                    
+                    if (multilineContent) {
+                        const commandPart = `<span>${code}</span>`;
+                        const contentPart = `<span class="block mt-2 text-slate-500 dark:text-slate-400 italic"># File content to paste:</span><span class="block">${multilineContent.replace(/\\n/g, '\n')}</span>`;
+                        pre.innerHTML = commandPart + contentPart;
+                    } else {
+                        codeEl.textContent = code;
+                        pre.appendChild(codeEl);
+                    }
+                    
+                    wrapper.appendChild(pre);
+
+                    const copyButton = document.createElement('button');
+                    copyButton.innerHTML = `<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg><span class="sr-only">Copy</span>`;
+                    copyButton.className = 'absolute top-2 right-2 p-1.5 rounded-md text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500';
+                    copyButton.title = 'Copy code';
+                    
+                    copyButton.addEventListener('click', () => {
+                        const textToCopy = multilineContent ? multilineContent.replace(/\\n/g, '\n') : code;
+                        const tempTextArea = document.createElement('textarea');
+                        tempTextArea.value = textToCopy;
+                        document.body.appendChild(tempTextArea);
+                        tempTextArea.select();
+                        try {
+                            document.execCommand('copy');
+                            copyButton.innerHTML = `<svg class="h-5 w-5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>`;
+                        } catch (err) {
+                            console.error('Failed to copy text: ', err);
+                            copyButton.innerHTML = `<svg class="h-5 w-5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>`;
+                        }
+                        document.body.removeChild(tempTextArea);
+
+                        setTimeout(() => {
+                            copyButton.innerHTML = `<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>`;
+                        }, 2000);
+                    });
+                    
+                    wrapper.appendChild(copyButton);
+                    block.appendChild(wrapper);
+                });
+            }
+
+            // --- Event Listeners ---
+            checkboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', updateProgress);
+            });
+            themeToggle.addEventListener('click', handleThemeToggle);
+
+            // --- Initializations ---
+            initializeTheme();
+            setupCodeBlocks();
+            updateProgress();
+        });
+    </script>
+</body>
+</html>
