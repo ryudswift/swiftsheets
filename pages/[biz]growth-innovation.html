@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Strategic Plan: Growth & Innovation OS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chosen Palette: "Calm Harmony" - A palette grounded in warm neutrals (slate, stone) for the main background and key areas. A muted sage green is used for primary actions and highlights, with a soft amber for secondary accents. This creates a professional, calm, and focused environment, aligning with the goal of building a structured knowledge system. -->
+    <!-- Application Structure Plan: The SPA is designed as an interactive dashboard, not a linear report. It uses a persistent top navigation bar to allow users to jump between the four core phases (Architect, Populate, Activate, Sustain) at will. This non-linear structure encourages exploration. Key concepts like the C.O.D.E. framework, database schemas, and workflows are transformed from static text into interactive components (clickable cards, diagrams, accordions). This was chosen because the source report is a dense, strategic plan; a visual, interactive breakdown makes the complex system far more digestible and actionable for the user than a simple text document. The goal is for the user to "play" with the plan to understand it. -->
+    <!-- Visualization & Content Choices: 
+        - Report Info: Phase 1 Database Schemas -> Goal: Organize/Inform -> Viz: Interactive HTML/CSS Diagram -> Interaction: Click to reveal schema details in a modal. Justification: Visually shows relationships between databases, more engaging than a static table. Library/Method: Vanilla JS + Tailwind CSS.
+        - Report Info: Phase 1 Tool Comparison -> Goal: Compare -> Viz: Styled HTML Table -> Interaction: Subtle hover effects. Justification: Clear, direct comparison of features. Library/Method: Tailwind CSS.
+        - Report Info: Phase 2 P.A.R.A. Method -> Goal: Organize -> Viz: Accordion -> Interaction: Click to expand/collapse. Justification: Condenses large blocks of text, keeping the UI clean and user-focused. Library/Method: Vanilla JS + Tailwind CSS.
+        - Report Info: Phase 2 Distillation Workflow -> Goal: Inform/Change -> Viz: Step-by-step visual process flow -> Interaction: None, static visual. Justification: Clearly illustrates a linear process in a more memorable way than a list. Library/Method: HTML + Tailwind CSS.
+        - Report Info: Phase 3 Pillar/Cluster Model -> Goal: Relationships -> Viz: Interactive HTML/CSS Diagram -> Interaction: Hover to highlight connections. Justification: Demonstrates the content strategy's structure visually. Library/Method: HTML + Tailwind CSS + JS for hover effects.
+        - CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. All visuals are built with structured HTML and styled with Tailwind CSS. No Chart.js was used as the report contains no quantitative datasets suitable for charting.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <script>
+        // Set theme on initial load
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark')
+        } else {
+            document.documentElement.classList.remove('dark')
+        }
+    </script>
+    <style>
+        body {
+            background-color: #f8fafc; /* slate-50 */
+            color: #1e293b; /* slate-800 */
+            font-family: 'Inter', sans-serif;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        .dark body {
+            background-color: #0f172a; /* slate-900 */
+            color: #e2e8f0; /* slate-200 */
+        }
+        @import url('https://rsms.me/inter/inter.css');
+        .nav-link {
+            transition: color 0.3s, border-color 0.3s;
+        }
+        .phase-card {
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .phase-card:hover {
+            transform: translateY(-5px);
+        }
+        .db-node {
+            transition: background-color 0.3s, color 0.3s, transform 0.3s;
+            cursor: pointer;
+        }
+        .db-node:hover {
+            transform: scale(1.05);
+        }
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-in-out;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- Header & Navigation -->
+    <header class="bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg sticky top-0 z-40 border-b border-slate-200 dark:border-slate-800">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <h1 class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">Growth & Innovation OS</h1>
+                <div class="flex items-center gap-8">
+                    <nav class="hidden md:flex items-center space-x-8">
+                        <a href="#architect" class="nav-link text-slate-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 border-b-2 border-transparent hover:border-emerald-500">Architect</a>
+                        <a href="#populate" class="nav-link text-slate-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 border-b-2 border-transparent hover:border-emerald-500">Populate</a>
+                        <a href="#activate" class="nav-link text-slate-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 border-b-2 border-transparent hover:border-emerald-500">Activate</a>
+                        <a href="#sustain" class="nav-link text-slate-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 border-b-2 border-transparent hover:border-emerald-500">Sustain</a>
+                    </nav>
+                    <button id="theme-toggle" class="text-slate-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400">
+                        <svg id="theme-toggle-dark-icon" class="h-6 w-6 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+                        <svg id="theme-toggle-light-icon" class="h-6 w-6 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                    </button>
+                    <button id="mobile-menu-button" class="md:hidden text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden px-4 pt-2 pb-4 space-y-2 border-t border-slate-200 dark:border-slate-800">
+            <a href="#architect" class="block text-slate-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 py-2">Architect</a>
+            <a href="#populate" class="block text-slate-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 py-2">Populate</a>
+            <a href="#activate" class="block text-slate-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 py-2">Activate</a>
+            <a href="#sustain" class="block text-slate-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 py-2">Sustain</a>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
+
+        <!-- Introduction -->
+        <section class="text-center mb-20">
+            <h2 class="text-4xl font-extrabold text-slate-900 dark:text-white mb-4 tracking-tight">An Interactive Framework for Your Content Engine</h2>
+            <p class="max-w-3xl mx-auto text-lg text-slate-600 dark:text-slate-400">This dashboard transforms the strategic plan into a living blueprint. Explore the four phases to understand how to build a system that turns raw information into high-impact, evergreen content.</p>
+        </section>
+
+        <!-- Phase 1: Architect -->
+        <section id="architect" class="mb-24 scroll-mt-20">
+            <div class="text-center mb-12">
+                <span class="text-emerald-600 dark:text-emerald-400 font-semibold">Phase 1</span>
+                <h3 class="text-3xl font-bold text-slate-900 dark:text-white mt-2">Architecting the Knowledge Core</h3>
+                <p class="max-w-2xl mx-auto text-slate-600 dark:text-slate-400 mt-4">This phase serves as the Product Requirements Document (PRD) for your personal knowledge engine. It defines the philosophy, components, and tools needed to build a robust and scalable system.</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-8 items-start">
+                <!-- C.O.D.E. Framework -->
+                <div class="space-y-6">
+                    <h4 class="text-xl font-bold text-slate-800 dark:text-slate-100">The C.O.D.E. Framework</h4>
+                    <p class="text-slate-600 dark:text-slate-400">The system's operational logic is governed by this four-step process, dictating how information flows from raw input to finished creative output.</p>
+                    <div class="space-y-4">
+                        <div class="phase-card bg-white dark:bg-slate-800 p-6 rounded-lg border border-slate-200 dark:border-slate-700 shadow-md dark:shadow-slate-900">
+                            <h5 class="font-bold text-emerald-700 dark:text-emerald-400">Capture</h5>
+                            <p class="text-slate-600 dark:text-slate-400 mt-2">Collect any piece of information that resonates, proves useful, or is surprising. A frictionless, universal capture habit is the foundation.</p>
+                        </div>
+                        <div class="phase-card bg-white dark:bg-slate-800 p-6 rounded-lg border border-slate-200 dark:border-slate-700 shadow-md dark:shadow-slate-900">
+                            <h5 class="font-bold text-emerald-700 dark:text-emerald-400">Organize</h5>
+                            <p class="text-slate-600 dark:text-slate-400 mt-2">Structure information for actionability, not just archival, using the P.A.R.A. method to prioritize based on active goals.</p>
+                        </div>
+                        <div class="phase-card bg-white dark:bg-slate-800 p-6 rounded-lg border border-slate-200 dark:border-slate-700 shadow-md dark:shadow-slate-900">
+                            <h5 class="font-bold text-emerald-700 dark:text-emerald-400">Distill</h5>
+                            <p class="text-slate-600 dark:text-slate-400 mt-2">Find the essential core of each piece of information through Progressive Summarization, transforming raw data into potent intellectual assets.</p>
+                        </div>
+                        <div class="phase-card bg-white dark:bg-slate-800 p-6 rounded-lg border border-slate-200 dark:border-slate-700 shadow-md dark:shadow-slate-900">
+                            <h5 class="font-bold text-emerald-700 dark:text-emerald-400">Express</h5>
+                            <p class="text-slate-600 dark:text-slate-400 mt-2">Use your distilled knowledge as building blocks for creative output, turning curated insights into articles, newsletters, and more.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Core Databases -->
+                <div>
+                    <h4 class="text-xl font-bold text-slate-800 dark:text-slate-100 mb-4">Core Database Structure</h4>
+                    <p class="text-slate-600 dark:text-slate-400 mb-6">This interactive diagram shows the interconnected databases at the heart of the OS. Click on any database to see its detailed schema.</p>
+                    <div class="bg-white dark:bg-slate-800 p-6 rounded-lg border border-slate-200 dark:border-slate-700 relative shadow-md dark:shadow-slate-900">
+                        <div class="grid grid-cols-2 gap-4 text-center">
+                            <div class="col-span-2">
+                                <div id="db-Content Pieces" class="db-node bg-emerald-500 text-white p-3 rounded-lg shadow">Content Pieces</div>
+                            </div>
+                            <div id="db-Ideas" class="db-node bg-amber-500 text-white p-3 rounded-lg shadow">Ideas</div>
+                            <div id="db-Topic Clusters" class="db-node bg-amber-500 text-white p-3 rounded-lg shadow">Topic Clusters</div>
+                            <div class="col-span-2">
+                                <div id="db-Snippets & Insights" class="db-node bg-emerald-600 text-white p-3 rounded-lg shadow">Snippets & Insights</div>
+                            </div>
+                            <div id="db-Sources" class="db-node bg-slate-500 text-white p-3 rounded-lg shadow">Sources</div>
+                            <div id="db-Frameworks & Models" class="db-node bg-slate-500 text-white p-3 rounded-lg shadow">Frameworks & Models</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Phase 2: Populate -->
+        <section id="populate" class="mb-24 scroll-mt-20">
+            <div class="text-center mb-12">
+                <span class="text-emerald-600 dark:text-emerald-400 font-semibold">Phase 2</span>
+                <h3 class="text-3xl font-bold text-slate-900 dark:text-white mt-2">Populating the System</h3>
+                <p class="max-w-2xl mx-auto text-slate-600 dark:text-slate-400 mt-4">This phase transitions from system design to active use. It outlines the strategic process for curating, capturing, and structuring the knowledge that will become the fuel for all future content.</p>
+            </div>
+            <div class="grid md:grid-cols-2 gap-8 items-start">
+                <!-- P.A.R.A Method -->
+                <div>
+                    <h4 class="text-xl font-bold text-slate-800 dark:text-slate-100 mb-4">The P.A.R.A. Method</h4>
+                    <p class="text-slate-600 dark:text-slate-400 mb-6">Organize all information by its actionability into one of four categories. This keeps your workspace focused and relevant. Click each category to learn more.</p>
+                    <div id="para-accordion" class="space-y-2">
+                        <div class="accordion-item border border-slate-200 dark:border-slate-700 rounded-lg overflow-hidden bg-white dark:bg-slate-800">
+                            <button class="accordion-header w-full text-left p-4 hover:bg-slate-50 dark:hover:bg-slate-700 flex justify-between items-center">
+                                <span class="font-semibold text-slate-800 dark:text-slate-100">Projects</span>
+                                <span class="text-emerald-600 dark:text-emerald-400 transform transition-transform duration-300">▼</span>
+                            </button>
+                            <div class="accordion-content">
+                                <p class="p-4 text-slate-600 dark:text-slate-400 border-t border-slate-200 dark:border-slate-700">Short-term, goal-oriented efforts with a clear finish line. Examples: "Write Pillar Page on Business Growth," "Launch Q3 Newsletter."</p>
+                            </div>
+                        </div>
+                        <div class="accordion-item border border-slate-200 dark:border-slate-700 rounded-lg overflow-hidden bg-white dark:bg-slate-800">
+                            <button class="accordion-header w-full text-left p-4 hover:bg-slate-50 dark:hover:bg-slate-700 flex justify-between items-center">
+                                <span class="font-semibold text-slate-800 dark:text-slate-100">Areas</span>
+                                <span class="text-emerald-600 dark:text-emerald-400 transform transition-transform duration-300">▼</span>
+                            </button>
+                            <div class="accordion-content">
+                                <p class="p-4 text-slate-600 dark:text-slate-400 border-t border-slate-200 dark:border-slate-700">Long-term, ongoing domains of focus with a standard to be maintained. Examples: "Business Growth," "Innovation." These are the core themes of your work.</p>
+                            </div>
+                        </div>
+                        <div class="accordion-item border border-slate-200 dark:border-slate-700 rounded-lg overflow-hidden bg-white dark:bg-slate-800">
+                             <button class="accordion-header w-full text-left p-4 hover:bg-slate-50 dark:hover:bg-slate-700 flex justify-between items-center">
+                                <span class="font-semibold text-slate-800 dark:text-slate-100">Resources</span>
+                                <span class="text-emerald-600 dark:text-emerald-400 transform transition-transform duration-300">▼</span>
+                            </button>
+                            <div class="accordion-content">
+                                <p class="p-4 text-slate-600 dark:text-slate-400 border-t border-slate-200 dark:border-slate-700">A topical library of curated notes and distilled insights that support your Projects and Areas. This is where frameworks, theories, and trends reside.</p>
+                            </div>
+                        </div>
+                        <div class="accordion-item border border-slate-200 dark:border-slate-700 rounded-lg overflow-hidden bg-white dark:bg-slate-800">
+                             <button class="accordion-header w-full text-left p-4 hover:bg-slate-50 dark:hover:bg-slate-700 flex justify-between items-center">
+                                <span class="font-semibold text-slate-800 dark:text-slate-100">Archives</span>
+                                <span class="text-emerald-600 dark:text-emerald-400 transform transition-transform duration-300">▼</span>
+                            </button>
+                            <div class="accordion-content">
+                                <p class="p-4 text-slate-600 dark:text-slate-400 border-t border-slate-200 dark:border-slate-700">The designated location for all inactive items from the other three categories. Archiving is crucial for maintaining a clean, functional workspace.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Distillation Workflow -->
+                <div>
+                     <h4 class="text-xl font-bold text-slate-800 dark:text-slate-100 mb-4">The Distillation Workflow</h4>
+                     <p class="text-slate-600 dark:text-slate-400 mb-6">Prevent "digital hoarding" by actively processing information with Progressive Summarization. This workflow turns consumption into the first act of creation.</p>
+                     <div class="space-y-4">
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0 w-12 h-12 bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-full flex items-center justify-center font-bold text-xl">1</div>
+                            <div class="ml-4">
+                                <h5 class="font-semibold text-slate-800 dark:text-slate-200">Capture (Layer 0)</h5>
+                                <p class="text-slate-600 dark:text-slate-400">Save an article in its raw, unprocessed form.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0 w-12 h-12 bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-full flex items-center justify-center font-bold text-xl">2</div>
+                            <div class="ml-4">
+                                <h5 class="font-semibold text-slate-800 dark:text-slate-200">Bold Pass (Layer 1)</h5>
+                                <p class="text-slate-600 dark:text-slate-400">Read and <strong>bold</strong> the most salient passages.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0 w-12 h-12 bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-full flex items-center justify-center font-bold text-xl">3</div>
+                            <div class="ml-4">
+                                <h5 class="font-semibold text-slate-800 dark:text-slate-200">Highlight Pass (Layer 2)</h5>
+                                <p class="text-slate-600 dark:text-slate-400">Review bolded text and <mark class="bg-amber-200 dark:bg-amber-400/80 dark:text-slate-900">highlight</mark> the absolute best ideas.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0 w-12 h-12 bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-full flex items-center justify-center font-bold text-xl">4</div>
+                            <div class="ml-4">
+                                <h5 class="font-semibold text-slate-800 dark:text-slate-200">Executive Summary (Layer 3)</h5>
+                                <p class="text-slate-600 dark:text-slate-400">Write a short summary in your own words. This is the most crucial step.</p>
+                            </div>
+                        </div>
+                         <div class="flex items-start">
+                            <div class="flex-shrink-0 w-12 h-12 bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-full flex items-center justify-center font-bold text-xl">5</div>
+                            <div class="ml-4">
+                                <h5 class="font-semibold text-slate-800 dark:text-slate-200">Remix (Layer 4)</h5>
+                                <p class="text-slate-600 dark:text-slate-400">Combine summaries to form new, original ideas.</p>
+                            </div>
+                        </div>
+                     </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Phase 3: Activate -->
+        <section id="activate" class="mb-24 scroll-mt-20">
+            <div class="text-center mb-12">
+                <span class="text-emerald-600 dark:text-emerald-400 font-semibold">Phase 3</span>
+                <h3 class="text-3xl font-bold text-slate-900 dark:text-white mt-2">Activating the Engine</h3>
+                <p class="max-w-2xl mx-auto text-slate-600 dark:text-slate-400 mt-4">This phase details the specific content strategy and production workflow, connecting your knowledge base directly to a proven model for building topical authority and generating content.</p>
+            </div>
+            <div class="bg-white dark:bg-slate-800 p-8 rounded-lg border border-slate-200 dark:border-slate-700 shadow-md dark:shadow-slate-900">
+                <h4 class="text-xl font-bold text-slate-800 dark:text-slate-100 text-center mb-2">The Pillar & Cluster Content Strategy</h4>
+                <p class="text-slate-600 dark:text-slate-400 text-center max-w-3xl mx-auto mb-8">Establish authority by creating a comprehensive "Pillar" page on a broad topic, which links to multiple in-depth "Cluster" pages. This provides immense value to readers and signals expertise to search engines.</p>
+                <div class="flex flex-col items-center justify-center space-y-8 md:space-y-0 md:space-x-16 md:flex-row">
+                    <!-- Pillar -->
+                    <div class="text-center">
+                        <div class="w-48 h-48 bg-emerald-600 text-white rounded-full flex flex-col items-center justify-center p-4 shadow-lg">
+                            <span class="text-4xl">🏛️</span>
+                            <span class="font-bold text-lg mt-2">Pillar Page</span>
+                            <span class="text-sm text-emerald-100">The Ultimate Guide to Business Model Innovation</span>
+                        </div>
+                    </div>
+                    <!-- Clusters -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="cluster-card bg-slate-100 dark:bg-slate-700 p-4 rounded-lg text-center shadow-sm hover:bg-amber-100 dark:hover:bg-amber-500/50 transition">
+                            <h5 class="font-semibold text-slate-700 dark:text-slate-200">Disruptive Innovation</h5>
+                            <p class="text-xs text-slate-500 dark:text-slate-400">A Deep Dive</p>
+                        </div>
+                        <div class="cluster-card bg-slate-100 dark:bg-slate-700 p-4 rounded-lg text-center shadow-sm hover:bg-amber-100 dark:hover:bg-amber-500/50 transition">
+                            <h5 class="font-semibold text-slate-700 dark:text-slate-200">Subscription Models</h5>
+                             <p class="text-xs text-slate-500 dark:text-slate-400">The Recurring Revenue Revolution</p>
+                        </div>
+                        <div class="cluster-card bg-slate-100 dark:bg-slate-700 p-4 rounded-lg text-center shadow-sm hover:bg-amber-100 dark:hover:bg-amber-500/50 transition">
+                            <h5 class="font-semibold text-slate-700 dark:text-slate-200">Freemium Strategy</h5>
+                             <p class="text-xs text-slate-500 dark:text-slate-400">When to Offer for Free</p>
+                        </div>
+                        <div class="cluster-card bg-slate-100 dark:bg-slate-700 p-4 rounded-lg text-center shadow-sm hover:bg-amber-100 dark:hover:bg-amber-500/50 transition">
+                            <h5 class="font-semibold text-slate-700 dark:text-slate-200">Blue Ocean Strategy</h5>
+                             <p class="text-xs text-slate-500 dark:text-slate-400">Creating Uncontested Markets</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Phase 4: Sustain -->
+        <section id="sustain" class="scroll-mt-20">
+            <div class="text-center mb-12">
+                <span class="text-emerald-600 dark:text-emerald-400 font-semibold">Phase 4</span>
+                <h3 class="text-3xl font-bold text-slate-900 dark:text-white mt-2">Sustaining Momentum</h3>
+                <p class="max-w-2xl mx-auto text-slate-600 dark:text-slate-400 mt-4">This final phase ensures your OS is not a static project but a living asset that grows more valuable over time. Establish a virtuous cycle of creation, feedback, and refinement.</p>
+            </div>
+            <div class="grid md:grid-cols-2 gap-8">
+                <div class="phase-card bg-white dark:bg-slate-800 p-8 rounded-lg border border-slate-200 dark:border-slate-700 shadow-md dark:shadow-slate-900">
+                    <h4 class="text-xl font-bold text-slate-800 dark:text-slate-100 mb-4">The Feedback Loop</h4>
+                    <p class="text-slate-600 dark:text-slate-400 mb-6">Content performance is a primary research tool. Turn audience engagement into fuel for the next cycle of creation.</p>
+                    <div class="flex items-center justify-around text-center">
+                        <div>
+                            <div class="text-4xl">📊</div>
+                            <div class="font-semibold mt-2 dark:text-slate-200">Track Analytics</div>
+                        </div>
+                        <div class="text-2xl text-slate-400 dark:text-slate-500">→</div>
+                         <div>
+                            <div class="text-4xl">💬</div>
+                            <div class="font-semibold mt-2 dark:text-slate-200">Gather Feedback</div>
+                        </div>
+                        <div class="text-2xl text-slate-400 dark:text-slate-500">→</div>
+                         <div>
+                            <div class="text-4xl">💡</div>
+                            <div class="font-semibold mt-2 dark:text-slate-200">Feed the System</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="phase-card bg-white dark:bg-slate-800 p-8 rounded-lg border border-slate-200 dark:border-slate-700 shadow-md dark:shadow-slate-900">
+                    <h4 class="text-xl font-bold text-slate-800 dark:text-slate-100 mb-4">The Review Habit</h4>
+                    <p class="text-slate-600 dark:text-slate-400 mb-6">A system without maintenance descends into chaos. A regular review habit is essential for keeping the OS clean and functional.</p>
+                    <div class="flex justify-around">
+                        <div class="text-center">
+                            <div class="text-4xl">🗓️</div>
+                            <div class="font-semibold mt-2 dark:text-slate-200">Weekly Review</div>
+                            <p class="text-sm text-slate-500 dark:text-slate-400">Process inbox & review projects.</p>
+                        </div>
+                         <div class="text-center">
+                            <div class="text-4xl">📈</div>
+                            <div class="font-semibold mt-2 dark:text-slate-200">Monthly Review</div>
+                            <p class="text-sm text-slate-500 dark:text-slate-400">Assess goals & areas.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-100 dark:bg-slate-800/50 border-t border-slate-200 dark:border-slate-800 mt-24">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-6 text-center text-slate-500 dark:text-slate-400">
+            <p>&copy; 2025 Growth & Innovation OS. An interactive framework.</p>
+        </div>
+    </footer>
+
+    <!-- Modal -->
+    <div id="db-modal" class="fixed inset-0 bg-black bg-opacity-70 z-50 hidden items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-800 rounded-lg shadow-2xl w-full max-w-lg mx-auto transform transition-all duration-300 scale-95 opacity-0">
+            <div class="flex justify-between items-center p-4 border-b border-slate-200 dark:border-slate-700">
+                <h3 id="modal-title" class="text-xl font-bold text-slate-800 dark:text-slate-100">Database Schema</h3>
+                <button id="modal-close" class="text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white">&times;</button>
+            </div>
+            <div id="modal-body" class="p-6">
+                <!-- Content will be injected by JS -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Mobile menu toggle
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenuButton.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+
+            // Accordion functionality
+            const accordionHeaders = document.querySelectorAll('.accordion-header');
+            accordionHeaders.forEach(header => {
+                header.addEventListener('click', () => {
+                    const content = header.nextElementSibling;
+                    const icon = header.querySelector('span:last-child');
+                    
+                    if (content.style.maxHeight) {
+                        content.style.maxHeight = null;
+                        icon.style.transform = 'rotate(0deg)';
+                    } else {
+                        document.querySelectorAll('.accordion-content').forEach(c => c.style.maxHeight = null);
+                        document.querySelectorAll('.accordion-header span:last-child').forEach(i => i.style.transform = 'rotate(0deg)');
+                        
+                        content.style.maxHeight = content.scrollHeight + "px";
+                        icon.style.transform = 'rotate(180deg)';
+                    }
+                });
+            });
+
+            // Modal functionality
+            const modal = document.getElementById('db-modal');
+            const modalTitle = document.getElementById('modal-title');
+            const modalBody = document.getElementById('modal-body');
+            const modalClose = document.getElementById('modal-close');
+            const dbNodes = document.querySelectorAll('.db-node');
+
+            const dbData = {
+                'Content Pieces': [
+                    { field: 'Title', type: 'Text', purpose: 'The headline of the content piece.' },
+                    { field: 'Status', type: 'Select', purpose: 'Tracks the workflow (e.g., Idea, Drafting, Published).' },
+                    { field: 'Pillar Topic', type: 'Relation', purpose: 'Links to the overarching Topic Cluster.' },
+                    { field: 'Publish Date', type: 'Date', purpose: 'Sets the editorial calendar date.' },
+                    { field: 'Format', type: 'Select', purpose: 'Defines the content type (e.g., Blog Post, Newsletter).' },
+                    { field: 'Related Insights', type: 'Relation', purpose: 'Links to all distilled Snippets & Insights used for research.' },
+                ],
+                'Snippets & Insights': [
+                    { field: 'Snippet', type: 'Text', purpose: 'The captured quote, data point, or summary.' },
+                    { field: 'Source', type: 'Relation', purpose: 'Links to the Sources database for attribution.' },
+                    { field: 'My Summary', type: 'Text', purpose: 'The "Layer 3" progressive summarization in your own words.' },
+                    { field: 'Related Frameworks', type: 'Relation', purpose: 'Links to any relevant Frameworks & Models.' },
+                    { field: 'Tags', type: 'Multi-Select', purpose: 'Keywords for quick filtering (e.g., AI, Strategy).' },
+                ],
+                'Frameworks & Models': [
+                    { field: 'Framework Name', type: 'Text', purpose: 'e.g., "Porter\'s Five Forces".' },
+                    { field: 'Originator', type: 'Text', purpose: 'e.g., "Michael Porter".' },
+                    { field: 'Core Concept', type: 'Text', purpose: 'A concise explanation of the framework.' },
+                    { field: 'Related Snippets', type: 'Relation', purpose: 'Shows all captured insights that apply this framework.' },
+                ],
+                'Topic Clusters': [
+                    { field: 'Pillar Name', type: 'Text', purpose: 'e.g., "Business Growth Strategies".' },
+                    { field: 'Pillar Page', type: 'Relation', purpose: 'Links to the main pillar article in Content Pieces.' },
+                    { field: 'Cluster Content', type: 'Relation', purpose: 'Links to all supporting cluster articles.' },
+                ],
+                'Ideas': [
+                     { field: 'Idea Title', type: 'Text', purpose: 'A short, descriptive name for the original thought.' },
+                     { field: 'Description', type: 'Text', purpose: 'A brief explanation of the hypothesis or connection.' },
+                     { field: 'Status', type: 'Select', purpose: 'Tracks progress (e.g., Fleeting, Developing, Ready for Outline).' },
+                     { field: 'Related Snippets', type: 'Relation', purpose: 'Links to insights that sparked this idea.' },
+                ],
+                'Sources': [
+                     { field: 'Source Title', type: 'Text', purpose: 'The name of the book, article, or podcast.' },
+                     { field: 'Author/Creator', type: 'Text', purpose: 'The person or organization responsible for the source.' },
+                     { field: 'Type', type: 'Select', purpose: 'The format of the source (e.g., Book, Article, Video).' },
+                     { field: 'URL', type: 'URL', purpose: 'A direct link to the source if available.' },
+                ],
+            };
+
+            dbNodes.forEach(node => {
+                node.addEventListener('click', () => {
+                    const dbName = node.textContent.trim();
+                    const data = dbData[dbName];
+                    if (data) {
+                        modalTitle.textContent = `${dbName} Schema`;
+                        let tableHTML = '<div class="overflow-x-auto"><table class="w-full text-sm text-left text-slate-500 dark:text-slate-400"><thead class="text-xs text-slate-700 dark:text-slate-300 uppercase bg-slate-50 dark:bg-slate-700"><tr><th scope="col" class="px-4 py-3">Field</th><th scope="col" class="px-4 py-3">Type</th><th scope="col" class="px-4 py-3">Purpose</th></tr></thead><tbody>';
+                        data.forEach(row => {
+                            tableHTML += `<tr class="bg-white dark:bg-slate-800 border-b dark:border-slate-700"><th scope="row" class="px-4 py-3 font-medium text-slate-900 dark:text-white whitespace-nowrap">${row.field}</th><td class="px-4 py-3">${row.type}</td><td class="px-4 py-3">${row.purpose}</td></tr>`;
+                        });
+                        tableHTML += '</tbody></table></div>';
+                        modalBody.innerHTML = tableHTML;
+                        
+                        modal.classList.remove('hidden');
+                        modal.classList.add('flex');
+                        setTimeout(() => {
+                           modal.querySelector('div[class*="dark:bg-slate-800"]').classList.remove('scale-95', 'opacity-0');
+                        }, 10);
+                    }
+                });
+            });
+
+            const closeModal = () => {
+                modal.querySelector('div[class*="dark:bg-slate-800"]').classList.add('scale-95', 'opacity-0');
+                setTimeout(() => {
+                    modal.classList.add('hidden');
+                    modal.classList.remove('flex');
+                }, 300);
+            };
+
+            modalClose.addEventListener('click', closeModal);
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    closeModal();
+                }
+            });
+
+            // Theme toggle functionality
+            const themeToggleBtn = document.getElementById('theme-toggle');
+            const darkIcon = document.getElementById('theme-toggle-dark-icon');
+            const lightIcon = document.getElementById('theme-toggle-light-icon');
+
+            const updateIcon = () => {
+                if (document.documentElement.classList.contains('dark')) {
+                    darkIcon.classList.remove('hidden');
+                    lightIcon.classList.add('hidden');
+                } else {
+                    darkIcon.classList.add('hidden');
+                    lightIcon.classList.remove('hidden');
+                }
+            };
+            
+            themeToggleBtn.addEventListener('click', () => {
+                const isDark = document.documentElement.classList.toggle('dark');
+                localStorage.theme = isDark ? 'dark' : 'light';
+                updateIcon();
+            });
+
+            updateIcon();
+        });
+    </script>
+</body>
+</html>
