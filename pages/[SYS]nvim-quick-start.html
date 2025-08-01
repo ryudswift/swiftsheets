@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neovim Quick-Start Guide</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        /* Custom styles to enhance the look and feel */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #1a1b26;
+            color: #c0caf5;
+        }
+        .kbd-key {
+            font-family: 'Fira Code', monospace;
+            background-color: #2e3040;
+            border: 1px solid #414868;
+            border-bottom-width: 3px;
+            border-radius: 6px;
+            padding: 0.25rem 0.5rem;
+            font-weight: 500;
+            color: #a9b1d6;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            display: inline-block;
+            line-height: 1.25;
+        }
+        .command-card {
+            background-color: #24283b;
+            border: 1px solid #414868;
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        .command-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.25);
+        }
+        h1, h2, h3 {
+            font-weight: 700;
+            color: #bb9af7;
+        }
+        h2 {
+            border-bottom: 2px solid #7aa2f7;
+            padding-bottom: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .pro-tip {
+            background-color: rgba(122, 162, 247, 0.1);
+            border-left: 4px solid #7aa2f7;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div class="container mx-auto p-4 sm:p-6 lg:p-8 max-w-4xl">
+
+        <!-- Header Section -->
+        <header class="text-center mb-12">
+            <h1 class="text-4xl sm:text-5xl font-bold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500">Neovim Quick-Start Guide</h1>
+            <p class="text-lg text-gray-400">Your first steps into a more powerful editor. No customization, just pure commands.</p>
+        </header>
+
+        <!-- Main Content -->
+        <main class="space-y-12">
+
+            <!-- Section 1: The Absolute Essentials -->
+            <section id="essentials">
+                <h2 class="text-3xl mb-6">The Absolute Essentials</h2>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <!-- Modes -->
+                    <div class="command-card">
+                        <h3 class="text-xl mb-4">Understanding Modes</h3>
+                        <p class="mb-4">Neovim is a <strong class="text-yellow-400">modal</strong> editor. You start in <strong class="text-green-400">Normal Mode</strong> for navigation and commands. To type, you must enter <strong class="text-blue-400">Insert Mode</strong>.</p>
+                        <ul class="space-y-3">
+                            <li><span class="kbd-key">i</span> &rarr; <strong class="text-blue-400">I</strong>nsert text before the cursor.</li>
+                            <li><span class="kbd-key">a</span> &rarr; <strong class="text-blue-400">A</strong>ppend text after the cursor.</li>
+                            <li><span class="kbd-key">Esc</span> &rarr; Return to <strong class="text-green-400">Normal Mode</strong>. This is your most important key!</li>
+                        </ul>
+                    </div>
+                    <!-- Saving & Quitting -->
+                    <div class="command-card">
+                        <h3 class="text-xl mb-4">Saving & Quitting</h3>
+                        <p class="mb-4">All these commands start with a colon (<span class="kbd-key">:</span>) in <strong class="text-green-400">Normal Mode</strong>.</p>
+                        <ul class="space-y-3">
+                            <li><span class="kbd-key">:w</span> &rarr; <strong class="text-yellow-400">w</strong>rite (save) the file.</li>
+                            <li><span class="kbd-key">:q</span> &rarr; <strong class="text-yellow-400">q</strong>uit the editor.</li>
+                            <li><span class="kbd-key">:wq</span> &rarr; Write <strong class="text-yellow-400">and</strong> quit (save & exit).</li>
+                            <li><span class="kbd-key">:q!</span> &rarr; Quit <strong class="text-red-400">without</strong> saving. The '!' forces the action.</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 2: Basic Navigation & Editing -->
+            <section id="navigation">
+                <h2 class="text-3xl mb-6">Basic Navigation & Editing</h2>
+                <div class="command-card">
+                    <p class="mb-6">All commands are used from <strong class="text-green-400">Normal Mode</strong>. Practice these until they become muscle memory.</p>
+                    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-4">
+                        <div>
+                            <h4 class="text-lg font-semibold text-blue-400 mb-2">Character Movement</h4>
+                            <ul class="space-y-2">
+                                <li><span class="kbd-key">h</span> &rarr; Move left</li>
+                                <li><span class="kbd-key">j</span> &rarr; Move down</li>
+                                <li><span class="kbd-key">k</span> &rarr; Move up</li>
+                                <li><span class="kbd-key">l</span> &rarr; Move right</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 class="text-lg font-semibold text-blue-400 mb-2">Word & Line Movement</h4>
+                            <ul class="space-y-2">
+                                <li><span class="kbd-key">w</span> &rarr; Forward one <strong class="text-yellow-400">w</strong>ord</li>
+                                <li><span class="kbd-key">b</span> &rarr; <strong class="text-yellow-400">B</strong>ackward one word</li>
+                                <li><span class="kbd-key">0</span> &rarr; Start of the line</li>
+                                <li><span class="kbd-key">$</span> &rarr; End of the line</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 class="text-lg font-semibold text-blue-400 mb-2">File Movement</h4>
+                            <ul class="space-y-2">
+                                <li><span class="kbd-key">gg</span> &rarr; Go to top of file</li>
+                                <li><span class="kbd-key">G</span> &rarr; Go to bottom of file</li>
+                                <li><span class="kbd-key">5G</span> &rarr; Go to line 5 (number + G)</li>
+                            </ul>
+                        </div>
+                        <div class="sm:col-span-2 lg:col-span-3 grid sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-4 pt-4 mt-4 border-t border-gray-700">
+                             <div>
+                                <h4 class="text-lg font-semibold text-red-400 mb-2">Deletion</h4>
+                                <ul class="space-y-2">
+                                    <li><span class="kbd-key">x</span> &rarr; Delete character</li>
+                                    <li><span class="kbd-key">dd</span> &rarr; Delete current line</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h4 class="text-lg font-semibold text-green-400 mb-2">Copy & Paste</h4>
+                                <ul class="space-y-2">
+                                    <li><span class="kbd-key">yy</span> &rarr; <strong class="text-yellow-400">Y</strong>ank (copy) line</li>
+                                    <li><span class="kbd-key">p</span> &rarr; <strong class="text-yellow-400">P</strong>aste after cursor</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h4 class="text-lg font-semibold text-purple-400 mb-2">Undo / Redo</h4>
+                                <ul class="space-y-2">
+                                    <li><span class="kbd-key">u</span> &rarr; <strong class="text-yellow-400">U</strong>ndo</li>
+                                    <li><span class="kbd-key">Ctrl</span> + <span class="kbd-key">r</span> &rarr; <strong class="text-yellow-400">R</strong>edo</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 3: The Vim Grammar -->
+            <section id="grammar">
+                <h2 class="text-3xl mb-6">The Vim Grammar: Verb + Noun</h2>
+                <div class="command-card">
+                    <p class="mb-4">Combine verbs (actions) with nouns (motions/text objects) for powerful, precise edits.</p>
+                    <p class="mb-6 text-center text-2xl font-mono tracking-wider"><span class="text-red-400">Verb</span> + <span class="text-blue-400">Noun</span> = <span class="text-green-400">Action</span></p>
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div>
+                            <h4 class="text-lg font-semibold text-red-400 mb-2">Verbs (Operators)</h4>
+                            <ul class="space-y-2">
+                                <li><span class="kbd-key">d</span> &rarr; delete</li>
+                                <li><span class="kbd-key">c</span> &rarr; change (delete then insert)</li>
+                                <li><span class="kbd-key">y</span> &rarr; yank (copy)</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 class="text-lg font-semibold text-blue-400 mb-2">Nouns (Motions)</h4>
+                            <ul class="space-y-2">
+                                <li><span class="kbd-key">w</span> &rarr; word</li>
+                                <li><span class="kbd-key">$</span> &rarr; to end of line</li>
+                                <li><span class="kbd-key">i</span><span class="kbd-key">w</span> &rarr; inner word</li>
+                                <li><span class="kbd-key">i</span><span class="kbd-key">)</span> &rarr; inside parentheses</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="pro-tip mt-6">
+                        <h4 class="font-bold text-lg text-blue-300 mb-2">Examples in Action:</h4>
+                        <ul class="list-disc list-inside space-y-2 font-mono">
+                            <li><span class="kbd-key">dw</span> &rarr; <strong class="text-red-400">d</strong>elete <strong class="text-blue-400">w</strong>ord</li>
+                            <li><span class="kbd-key">c$</span> &rarr; <strong class="text-red-400">c</strong>hange to end of <strong class="text-blue-400">line</strong></li>
+                            <li><span class="kbd-key">di)</span> &rarr; <strong class="text-red-400">d</strong>elete <strong class="text-blue-400">i</strong>nside <strong class="text-blue-400">)</span></li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 4: Intermediate Techniques -->
+            <section id="advanced">
+                <h2 class="text-3xl mb-6">Intermediate Techniques</h2>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <!-- Search -->
+                    <div class="command-card">
+                        <h3 class="text-xl mb-4">Search</h3>
+                        <ul class="space-y-3">
+                            <li><span class="kbd-key">/</span> + <span class="italic text-gray-400">term</span> + <span class="kbd-key">Enter</span> &rarr; Search forward</li>
+                            <li><span class="kbd-key">?</span> + <span class="italic text-gray-400">term</span> + <span class="kbd-key">Enter</span> &rarr; Search backward</li>
+                            <li><span class="kbd-key">n</span> &rarr; Jump to <strong class="text-yellow-400">n</strong>ext match</li>
+                            <li><span class="kbd-key">N</span> &rarr; Jump to previous match</li>
+                        </ul>
+                    </div>
+                    <!-- Visual Mode & Splits -->
+                    <div class="command-card">
+                        <h3 class="text-xl mb-4">Visual Mode & Window Splits</h3>
+                         <ul class="space-y-3">
+                            <li><span class="kbd-key">v</span> &rarr; Enter <strong class="text-purple-400">V</strong>isual mode (select text)</li>
+                            <li><span class="kbd-key">:sp</span> &rarr; <strong class="text-yellow-400">Sp</strong>lit window horizontally</li>
+                            <li><span class="kbd-key">:vsp</span> &rarr; <strong class="text-yellow-400">V</strong>ertically <strong class="text-yellow-400">sp</strong>lit window</li>
+                            <li><span class="kbd-key">Ctrl</span>+<span class="kbd-key">w</span> <span class="kbd-key">h/j/k/l</span> &rarr; Navigate splits</li>
+                        </ul>
+                    </div>
+                </div>
+                 <div class="command-card mt-6">
+                    <h3 class="text-xl mb-4">The Dot Operator: Your Superpower</h3>
+                    <p class="mb-4">The dot (<span class="kbd-key">.</span>) command is one of Vim's most powerful features. It repeats the last <strong class="text-yellow-400">change</strong> you made.</p>
+                    <div class="pro-tip">
+                        <p>Imagine you deleted a word with <span class="kbd-key">dw</span>. You can now go to any other word and press <span class="kbd-key">.</span> to delete it too. This works for any change, like <span class="kbd-key">ciw</span>, <span class="kbd-key">x</span>, etc.</p>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- Footer -->
+        <footer class="text-center mt-16 text-gray-500">
+            <p>Master these commands to build a solid foundation. Happy Vimming!</p>
+        </footer>
+
+    </div>
+
+</body>
+</html>
