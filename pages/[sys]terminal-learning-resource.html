@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wargames & Terminal Learning Resources</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom font */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0a0a1a; /* Dark blue-black background */
+            color: #e0e0e0;
+            overflow-x: hidden; /* Prevent horizontal scroll */
+        }
+
+        .orbitron {
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        /* Canvas for background animation */
+        #particle-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        /* Card container perspective */
+        .card-container {
+            perspective: 1000px;
+        }
+
+        /* Individual card styling */
+        .card {
+            transform-style: preserve-3d;
+            transition: transform 0.5s ease, box-shadow 0.5s ease;
+            background: rgba(16, 24, 48, 0.6); /* Semi-transparent dark blue */
+            border: 1px solid rgba(0, 191, 255, 0.3); /* Deep sky blue border */
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 0 0 15px rgba(0, 191, 255, 0.2), 
+                        0 0 30px rgba(0, 191, 255, 0.1),
+                        inset 0 0 10px rgba(0, 191, 255, 0.1);
+        }
+
+        /* Hover effect for the card */
+        .card:hover {
+            transform: translateZ(20px) rotateX(5deg) rotateY(5deg);
+            box-shadow: 0 0 30px rgba(0, 191, 255, 0.6), 
+                        0 0 60px rgba(0, 191, 255, 0.3),
+                        inset 0 0 15px rgba(0, 191, 255, 0.2);
+        }
+
+        /* Pulsating glow animation */
+        @keyframes glow {
+            0%, 100% {
+                box-shadow: 0 0 15px rgba(0, 191, 255, 0.2), 
+                            0 0 30px rgba(0, 191, 255, 0.1),
+                            inset 0 0 10px rgba(0, 191, 255, 0.1);
+            }
+            50% {
+                box-shadow: 0 0 25px rgba(0, 191, 255, 0.4), 
+                            0 0 50px rgba(0, 191, 255, 0.2),
+                            inset 0 0 12px rgba(0, 191, 255, 0.15);
+            }
+        }
+
+        .card {
+            animation: glow 4s infinite ease-in-out;
+        }
+
+        /* Card title styling */
+        .card-title {
+            color: #00bfff; /* Deep sky blue */
+            text-shadow: 0 0 5px rgba(0, 191, 255, 0.7);
+        }
+    </style>
+</head>
+<body class="min-h-screen w-full">
+    
+    <canvas id="particle-canvas"></canvas>
+
+    <div class="container mx-auto p-4 sm:p-6 lg:p-8 relative z-10">
+        <header class="text-center mb-12">
+            <h1 class="text-4xl md:text-5xl font-bold orbitron mb-2 text-white">Wargames & Learning Resources</h1>
+            <p class="text-lg text-gray-400">An interactive list of resources to hone your terminal and security skills.</p>
+        </header>
+
+        <div id="wargames-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- Wargame cards will be injected here by JavaScript -->
+        </div>
+    </div>
+
+    <script>
+        // --- Particle Network Animation ---
+        const canvas = document.getElementById('particle-canvas');
+        const ctx = canvas.getContext('2d');
+
+        let particlesArray;
+
+        function setupCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            particlesArray = [];
+            const numberOfParticles = (canvas.height * canvas.width) / 9000;
+            for (let i = 0; i < numberOfParticles; i++) {
+                let size = (Math.random() * 2) + 1;
+                let x = (Math.random() * ((innerWidth - size * 2) - (size * 2)) + size * 2);
+                let y = (Math.random() * ((innerHeight - size * 2) - (size * 2)) + size * 2);
+                let directionX = (Math.random() * .4) - .2;
+                let directionY = (Math.random() * .4) - .2;
+                let color = 'rgba(0, 191, 255, 0.8)';
+
+                particlesArray.push({ x, y, directionX, directionY, size, color });
+            }
+        }
+
+        function animateParticles() {
+            requestAnimationFrame(animateParticles);
+            ctx.clearRect(0, 0, innerWidth, innerHeight);
+
+            for (let i = 0; i < particlesArray.length; i++) {
+                let particle = particlesArray[i];
+                particle.x += particle.directionX;
+                particle.y += particle.directionY;
+
+                if (particle.x + particle.size > canvas.width || particle.x - particle.size < 0) {
+                    particle.directionX = -particle.directionX;
+                }
+                if (particle.y + particle.size > canvas.height || particle.y - particle.size < 0) {
+                    particle.directionY = -particle.directionY;
+                }
+                
+                ctx.beginPath();
+                ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2, false);
+                ctx.fillStyle = particle.color;
+                ctx.fill();
+            }
+            connectParticles();
+        }
+
+        function connectParticles() {
+            let opacityValue = 1;
+            for (let a = 0; a < particlesArray.length; a++) {
+                for (let b = a; b < particlesArray.length; b++) {
+                    let distance = ((particlesArray[a].x - particlesArray[b].x) * (particlesArray[a].x - particlesArray[b].x)) +
+                                 ((particlesArray[a].y - particlesArray[b].y) * (particlesArray[a].y - particlesArray[b].y));
+                    
+                    if (distance < (canvas.width / 7) * (canvas.height / 7)) {
+                        opacityValue = 1 - (distance / 20000);
+                        ctx.strokeStyle = `rgba(0, 191, 255, ${opacityValue})`;
+                        ctx.lineWidth = 1;
+                        ctx.beginPath();
+                        ctx.moveTo(particlesArray[a].x, particlesArray[a].y);
+                        ctx.lineTo(particlesArray[b].x, particlesArray[b].y);
+                        ctx.stroke();
+                    }
+                }
+            }
+        }
+
+        window.addEventListener('resize', () => {
+            setupCanvas();
+        });
+
+        // Initialize and start animation
+        setupCanvas();
+        animateParticles();
+
+
+        // --- Wargame Card Generation ---
+        const wargames = [
+            { title: "OverTheWire: Bandit", description: "A wargame for beginners to learn the Linux command line and basic security concepts.", url: "https://overthewire.org/wargames/bandit/" },
+            { title: "Terminus", description: "A terminal-based 'choose your own adventure' game to practice basic Linux commands.", url: "https://www.terminist.com/" },
+            { title: "Vim Adventures", description: "A 2D adventure puzzle game to learn the Vim text editor.", url: "https://vim-adventures.com/" },
+            { title: "clmystery", description: "A command-line murder mystery game to practice your Linux command-line skills.", url: "https://github.com/veltman/clmystery" },
+            { title: "bashcrawl", description: "A text-based adventure game that teaches the basics of the Bash shell.", url: "https://gitlab.com/slackermedia/bashcrawl" },
+            { title: "cmdchallenge", description: "A series of challenges to test your knowledge of the Linux command line.", url: "https://cmdchallenge.com/" },
+            { title: "WeChall", description: "A site with challenges in programming, logic, and Linux/Windows.", url: "https://www.wechall.net/" },
+            { title: "root-me", description: "A platform with challenges in programming, steganography, and cryptography.", url: "https://www.root-me.org/" },
+            { title: "pwnable.kr", description: "A wargame site that focuses on 'pawning' or exploiting vulnerabilities in software.", url: "http://pwnable.kr/" },
+            { title: "HackerGateway", description: "A site with challenges in steganography, cryptography, and web security.", url: "https://hackergateway.com/" },
+            { title: "Reversing.kr", description: "A wargame site that specializes in reverse engineering.", url: "http://reversing.kr/" },
+            { title: "Hack The Box", description: "A popular platform for penetration testing practice.", url: "https://www.hackthebox.com/" },
+            { title: "Codingame", description: "A platform to improve your programming skills through games and challenges.", url: "https://www.codingame.com/" },
+            { title: "CryptoHack", description: "A site that focuses on cryptography challenges.", url: "https://cryptohack.org/" },
+            { title: "Lord of the SQLI", description: "A wargame that teaches you about SQL injection vulnerabilities.", url: "https://lordofsqli.com/" }
+        ];
+
+        const grid = document.getElementById('wargames-grid');
+
+        wargames.forEach(game => {
+            const cardContainer = document.createElement('div');
+            cardContainer.className = 'card-container';
+
+            const cardLink = document.createElement('a');
+            cardLink.href = game.url;
+            cardLink.target = '_blank';
+            cardLink.rel = 'noopener noreferrer';
+            cardLink.className = 'card block p-6 rounded-lg h-full flex flex-col';
+
+            const title = document.createElement('h2');
+            title.className = 'text-2xl font-bold orbitron card-title mb-3';
+            title.textContent = game.title;
+
+            const description = document.createElement('p');
+            description.className = 'text-gray-300 flex-grow';
+            description.textContent = game.description;
+            
+            const linkIndicator = document.createElement('span');
+            linkIndicator.className = 'text-sm text-cyan-400 mt-4 block';
+            linkIndicator.textContent = 'Visit Site →';
+
+            cardLink.appendChild(title);
+            cardLink.appendChild(description);
+            cardLink.appendChild(linkIndicator);
+            cardContainer.appendChild(cardLink);
+            grid.appendChild(cardContainer);
+
+            // 3D tilt effect on mouse move
+            cardContainer.addEventListener('mousemove', (e) => {
+                const card = cardLink;
+                const { left, top, width, height } = card.getBoundingClientRect();
+                const x = e.clientX - left - width / 2;
+                const y = e.clientY - top - height / 2;
+
+                const rotateX = (y / height) * -15; // Invert for natural feel
+                const rotateY = (x / width) * 15;
+
+                card.style.transform = `translateZ(20px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+            });
+
+            cardContainer.addEventListener('mouseleave', () => {
+                cardLink.style.transform = 'translateZ(0) rotateX(0) rotateY(0)';
+            });
+        });
+    </script>
+</body>
+</html>
