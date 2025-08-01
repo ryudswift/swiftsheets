@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en" class="theme-ubuntu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Essential Server Security & Caddy Setup v1.00</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Particles.js for background effects -->
+    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&family=Ubuntu+Mono:wght@400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- Theme Definitions --- */
+        :root { /* Default: Ubuntu Theme */
+            --bg-dark: #2c001e;
+            --text-main: #f2f2f2;
+            --text-muted: #d9d9d9;
+            --highlight-primary: #E95420;
+            --highlight-secondary: #dd4814;
+            --border-color: #58334d;
+            --particle-color: #E95420;
+            --particle-line-color: #58334d;
+            --bg-card-glass: rgba(59, 20, 47, 0.25);
+            --border-card-glass: rgba(233, 84, 32, 0.2);
+            --border-card-glow: rgba(233, 84, 32, 0.5);
+            --checkbox-checked-bg: #E95420;
+            --terminal-bg: #1e0015;
+        }
+
+        .theme-pastel-terminal {
+            --bg-dark: #211F2C;
+            --text-main: #EAE6FF;
+            --text-muted: #b0a9d4;
+            --highlight-primary: #A48DFA;
+            --highlight-secondary: #8DFAAF;
+            --border-color: #403d52;
+            --particle-color: #A48DFA;
+            --particle-line-color: #403d52;
+            --bg-card-glass: rgba(42, 39, 57, 0.25);
+            --border-card-glass: rgba(164, 141, 250, 0.2);
+            --border-card-glow: rgba(164, 141, 250, 0.5);
+            --checkbox-checked-bg: #A48DFA;
+            --terminal-bg: #1a1823;
+        }
+
+        .theme-light-fruity {
+            --bg-dark: #FFF9F2;
+            --text-main: #5D4037;
+            --text-muted: #795548;
+            --highlight-primary: #FF7043;
+            --highlight-secondary: #FFCA28;
+            --border-color: #FFCCBC;
+            --particle-color: #FF7043;
+            --particle-line-color: #FFCCBC;
+            --bg-card-glass: rgba(255, 255, 255, 0.4);
+            --border-card-glass: rgba(255, 112, 67, 0.3);
+            --border-card-glow: rgba(255, 112, 67, 0.6);
+            --checkbox-checked-bg: #FF7043;
+            --terminal-bg: #fff5eb;
+        }
+
+        /* --- Core Styles --- */
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Ubuntu', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            transition: background-color 0.5s ease, color 0.5s ease;
+            overflow-x: hidden;
+        }
+        h1, h2, h3, h4, h5, h6 { font-family: 'Ubuntu Mono', monospace; }
+        
+        /* --- Decorative Backgrounds --- */
+        .background-blobs {
+            position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%;
+            overflow: hidden; z-index: 0;
+        }
+        .background-blobs div {
+            position: absolute; border-radius: 50%;
+            filter: blur(120px); opacity: 0.4;
+            transition: background 0.5s ease;
+        }
+        .blob1 {
+            width: 450px; height: 450px; background: var(--highlight-primary);
+            top: -150px; left: -150px;
+        }
+        .blob2 {
+            width: 350px; height: 350px; background: var(--highlight-secondary);
+            bottom: -100px; right: -100px;
+        }
+
+        #particles-js {
+            position: fixed; width: 100%; height: 100%;
+            top: 0; left: 0; z-index: 1;
+        }
+        .content-wrapper { position: relative; z-index: 2; }
+
+        /* --- Card Styles (Glassmorphism + 3D) --- */
+        .step-card {
+            background: var(--bg-card-glass);
+            border: 1px solid var(--border-card-glass);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 1rem;
+            transform-style: preserve-3d;
+            transition: transform 0.1s linear, border-color 0.3s ease, box-shadow 0.3s ease;
+            display: flex; flex-direction: column;
+        }
+        .step-card:hover {
+            transform: perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1.02, 1.02, 1.02);
+            border-color: var(--border-card-glow);
+            box-shadow: 0 0 30px -10px var(--border-card-glow);
+        }
+        .step-card.completed {
+             border-left: 4px solid var(--highlight-secondary);
+        }
+        .highlight { color: var(--highlight-primary); }
+
+        /* --- Glowing Header --- */
+        .glow {
+            text-shadow: 0 0 8px var(--highlight-primary), 0 0 20px var(--highlight-secondary);
+            animation: pulse-glow 3s infinite alternate;
+        }
+
+        @keyframes pulse-glow {
+            from { text-shadow: 0 0 8px var(--highlight-primary), 0 0 20px var(--highlight-secondary); }
+            to { text-shadow: 0 0 12px var(--highlight-primary), 0 0 30px var(--highlight-secondary); }
+        }
+        
+        /* --- Terminal/Code Block Style --- */
+        pre {
+            background-color: var(--terminal-bg);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            font-family: 'Ubuntu Mono', monospace;
+            font-size: 0.95rem;
+            position: relative;
+            overflow-x: auto;
+            border: 1px solid var(--border-color);
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: var(--bg-card-glass);
+            border: 1px solid var(--border-card-glass);
+            color: var(--text-muted);
+            padding: 0.3rem 0.6rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: 'Ubuntu', sans-serif;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .copy-btn:hover {
+            border-color: var(--border-card-glow);
+            color: var(--text-main);
+        }
+
+        /* --- Custom Checkbox --- */
+        .checkbox-container {
+            display: block; position: relative;
+            padding-left: 30px; margin-bottom: 12px;
+            cursor: pointer; font-size: 22px; user-select: none;
+        }
+        .checkbox-container input {
+            position: absolute; opacity: 0; cursor: pointer; height: 0; width: 0;
+        }
+        .checkmark {
+            position: absolute; top: 0; left: 0;
+            height: 25px; width: 25px;
+            background-color: transparent;
+            border: 2px solid var(--border-color);
+            border-radius: 5px;
+            transition: background-color 0.2s ease, border-color 0.2s ease;
+        }
+        .checkbox-container:hover input ~ .checkmark {
+            border-color: var(--highlight-primary);
+        }
+        .checkbox-container input:checked ~ .checkmark {
+            background-color: var(--checkbox-checked-bg);
+            border-color: var(--checkbox-checked-bg);
+        }
+        .checkmark:after {
+            content: ""; position: absolute; display: none;
+        }
+        .checkbox-container input:checked ~ .checkmark:after {
+            display: block;
+        }
+        .checkbox-container .checkmark:after {
+            left: 8px; top: 4px;
+            width: 6px; height: 12px;
+            border: solid var(--bg-dark);
+            border-width: 0 3px 3px 0;
+            transform: rotate(45deg);
+        }
+
+        /* --- Theme Switcher FAB --- */
+        #theme-fab-container { position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 100; }
+        .fab {
+            width: 3.5rem; height: 3.5rem; border-radius: 50%;
+            background-color: var(--bg-card-glass);
+            border: 2px solid var(--border-color);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            backdrop-filter: blur(10px);
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: all 0.3s ease;
+        }
+        .fab:hover { transform: scale(1.1) rotate(15deg); }
+        .fab-icon { width: 1.5rem; height: 1.5rem; color: var(--highlight-primary); }
+
+    </style>
+</head>
+<body class="antialiased">
+    <!-- Background Elements -->
+    <div class="background-blobs">
+        <div class="blob1"></div>
+        <div class="blob2"></div>
+    </div>
+    <div id="particles-js"></div>
+
+    <!-- Main Content Wrapper -->
+    <div class="content-wrapper container mx-auto p-4 md:p-8 max-w-5xl">
+        <!-- Header -->
+        <header class="text-center mb-12 pt-8 sm:pt-16">
+            <h1 class="text-4xl md:text-6xl font-bold glow">Server Security Guide</h1>
+            <p class="text-lg mt-2" style="color: var(--text-muted);">v1.00 - Interactive Setup</p>
+        </header>
+
+        <!-- Main Grid for Step Cards -->
+        <main class="space-y-8">
+            <!-- Section 1: Update & Firewall -->
+            <section id="update-firewall">
+                <h2 class="text-3xl font-bold mb-6 highlight">🛡️ 1. Initial System Update & Firewall</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="step-card" data-step-id="step1">
+                        <div class="p-6">
+                            <div class="flex justify-between items-start mb-4">
+                                <h3 class="text-lg font-bold text-white pr-4">Update & Upgrade System</h3>
+                                <label class="checkbox-container"><input type="checkbox" class="step-checkbox"><span class="checkmark"></span></label>
+                            </div>
+                            <pre><code class="language-bash">sudo apt update && sudo apt upgrade -y</code><button class="copy-btn">Copy</button></pre>
+                            <p class="text-sm mt-4" style="color: var(--text-muted);">Ensures your server has the latest security patches. This is your first and most important line of defense.</p>
+                        </div>
+                    </div>
+                    <div class="step-card" data-step-id="step2">
+                        <div class="p-6">
+                            <div class="flex justify-between items-start mb-4">
+                                <h3 class="text-lg font-bold text-white pr-4">Install Security Tools</h3>
+                                <label class="checkbox-container"><input type="checkbox" class="step-checkbox"><span class="checkmark"></span></label>
+                            </div>
+                            <pre><code class="language-bash">sudo apt install fail2ban ufw</code><button class="copy-btn">Copy</button></pre>
+                            <p class="text-sm mt-4" style="color: var(--text-muted);">Installs a firewall (UFW) and a tool (Fail2Ban) to block brute-force login attempts.</p>
+                        </div>
+                    </div>
+                    <div class="step-card" data-step-id="step3">
+                        <div class="p-6">
+                            <div class="flex justify-between items-start mb-4">
+                                <h3 class="text-lg font-bold text-white pr-4">Allow SSH Connections</h3>
+                                <label class="checkbox-container"><input type="checkbox" class="step-checkbox"><span class="checkmark"></span></label>
+                            </div>
+                            <pre><code class="language-bash">sudo ufw allow ssh</code><button class="copy-btn">Copy</button></pre>
+                            <p class="text-sm mt-4" style="color: var(--text-muted);">Crucial step! This allows you to connect to your server after the firewall is active. Don't skip this.</p>
+                        </div>
+                    </div>
+                    <div class="step-card" data-step-id="step4">
+                        <div class="p-6">
+                            <div class="flex justify-between items-start mb-4">
+                                <h3 class="text-lg font-bold text-white pr-4">Enable the Firewall</h3>
+                                <label class="checkbox-container"><input type="checkbox" class="step-checkbox"><span class="checkmark"></span></label>
+                            </div>
+                            <pre><code class="language-bash">sudo ufw enable</code><button class="copy-btn">Copy</button></pre>
+                            <p class="text-sm mt-4" style="color: var(--text-muted);">Activates the firewall, blocking all incoming connections except for those you've explicitly allowed (like SSH).</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 2: Malware Scan -->
+            <section id="malware-scan">
+                <h2 class="text-3xl font-bold mb-6 highlight">🦠 2. Scan for Malware & Rootkits</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="step-card" data-step-id="step5">
+                        <div class="p-6">
+                            <div class="flex justify-between items-start mb-4">
+                                <h3 class="text-lg font-bold text-white pr-4">Install Scanning Tools</h3>
+                                <label class="checkbox-container"><input type="checkbox" class="step-checkbox"><span class="checkmark"></span></label>
+                            </div>
+                            <pre><code class="language-bash">sudo apt install rkhunter clamav</code><button class="copy-btn">Copy</button></pre>
+                            <p class="text-sm mt-4" style="color: var(--text-muted);">Installs Rootkit Hunter and ClamAV to scan for hidden threats and known malware.</p>
+                        </div>
+                    </div>
+                    <div class="step-card" data-step-id="step6">
+                        <div class="p-6">
+                            <div class="flex justify-between items-start mb-4">
+                                <h3 class="text-lg font-bold text-white pr-4">Run Rootkit Hunter</h3>
+                                <label class="checkbox-container"><input type="checkbox" class="step-checkbox"><span class="checkmark"></span></label>
+                            </div>
+                            <pre><code class="language-bash">sudo rkhunter --check</code><button class="copy-btn">Copy</button></pre>
+                            <p class="text-sm mt-4" style="color: var(--text-muted);">Scans for backdoors and local exploits. Press Enter to proceed through the checks when prompted.</p>
+                        </div>
+                    </div>
+                    <div class="step-card col-span-1 md:col-span-2" data-step-id="step7">
+                        <div class="p-6">
+                            <div class="flex justify-between items-start mb-4">
+                                <h3 class="text-lg font-bold text-white pr-4">Run Full Antivirus Scan</h3>
+                                <label class="checkbox-container"><input type="checkbox" class="step-checkbox"><span class="checkmark"></span></label>
+                            </div>
+                            <pre><code class="language-bash">sudo clamscan -r /</code><button class="copy-btn">Copy</button></pre>
+                            <p class="text-sm mt-4" style="color: var(--text-muted);">Performs a recursive scan of the entire filesystem. This can take a very long time to complete but is thorough.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Section 3: Caddy Install -->
+            <section id="caddy-install">
+                <h2 class="text-3xl font-bold mb-6 highlight">🌐 3. Install Caddy Web Server</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="step-card col-span-1 md:col-span-2" data-step-id="step8">
+                        <div class="p-6">
+                            <div class="flex justify-between items-start mb-4">
+                                <h3 class="text-lg font-bold text-white pr-4">Install Prerequisites</h3>
+                                <label class="checkbox-container"><input type="checkbox" class="step-checkbox"><span class="checkmark"></span></label>
+                            </div>
+                            <pre><code class="language-bash">sudo apt install -y debian-keyring debian-archive-keyring apt-transport-https</code><button class="copy-btn">Copy</button></pre>
+                            <p class="text-sm mt-4" style="color: var(--text-muted);">Installs packages needed to securely add and verify new software sources.</p>
+                        </div>
+                    </div>
+                    <div class="step-card col-span-1 md:col-span-2" data-step-id="step9">
+                        <div class="p-6">
+                            <div class="flex justify-between items-start mb-4">
+                                <h3 class="text-lg font-bold text-white pr-4">Add Caddy's GPG Key</h3>
+                                <label class="checkbox-container"><input type="checkbox" class="step-checkbox"><span class="checkmark"></span></label>
+                            </div>
+                            <pre><code class="language-bash">curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' | sudo gpg --dearmor -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg</code><button class="copy-btn">Copy</button></pre>
+                            <p class="text-sm mt-4" style="color: var(--text-muted);">Securely adds the key that verifies the authenticity of the Caddy software.</p>
+                        </div>
+                    </div>
+                    <div class="step-card col-span-1 md:col-span-2" data-step-id="step10">
+                        <div class="p-6">
+                            <div class="flex justify-between items-start mb-4">
+                                <h3 class="text-lg font-bold text-white pr-4">Add the Caddy Repository</h3>
+                                <label class="checkbox-container"><input type="checkbox" class="step-checkbox"><span class="checkmark"></span></label>
+                            </div>
+                            <pre><code class="language-bash">curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' | sudo tee /etc/apt/sources.list.d/caddy-stable.list</code><button class="copy-btn">Copy</button></pre>
+                            <p class="text-sm mt-4" style="color: var(--text-muted);">Tells your system where to download Caddy from, ensuring you get official updates.</p>
+                        </div>
+                    </div>
+                    <div class="step-card" data-step-id="step11">
+                        <div class="p-6">
+                            <div class="flex justify-between items-start mb-4">
+                                <h3 class="text-lg font-bold text-white pr-4">Update Package Lists</h3>
+                                <label class="checkbox-container"><input type="checkbox" class="step-checkbox"><span class="checkmark"></span></label>
+                            </div>
+                            <pre><code class="language-bash">sudo apt update</code><button class="copy-btn">Copy</button></pre>
+                            <p class="text-sm mt-4" style="color: var(--text-muted);">Refreshes your software lists to include the newly added Caddy repository.</p>
+                        </div>
+                    </div>
+                    <div class="step-card" data-step-id="step12">
+                        <div class="p-6">
+                            <div class="flex justify-between items-start mb-4">
+                                <h3 class="text-lg font-bold text-white pr-4">Install Caddy</h3>
+                                <label class="checkbox-container"><input type="checkbox" class="step-checkbox"><span class="checkmark"></span></label>
+                            </div>
+                            <pre><code class="language-bash">sudo apt install caddy</code><button class="copy-btn">Copy</button></pre>
+                            <p class="text-sm mt-4" style="color: var(--text-muted);">The final step! Installs the Caddy web server, which starts running automatically.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+        
+        <footer class="text-center mt-12 py-8 text-sm" style="color: var(--text-muted);">
+            <p>&copy; 2024 Server Security Guide | Built with Gemini</p>
+        </footer>
+    </div>
+
+    <!-- Theme Switcher -->
+    <div id="theme-fab-container">
+         <button id="theme-fab-toggle" class="fab" title="Switch Theme">
+            <svg class="fab-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4.098 19.902a3.75 3.75 0 005.304 0l6.401-6.402a3.75 3.75 0 00-5.304-5.304L4.098 14.6c-.39.39-.39 1.023 0 1.414l.495.495a1.875 1.875 0 010 2.652l-.495.495a1.875 1.875 0 01-2.652 0l-.495-.495a1.875 1.875 0 010-2.652l6.402-6.401a3.75 3.75 0 005.304 5.304l-6.402 6.401a3.75 3.75 0 00-5.304 0z" />
+            </svg>
+        </button>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const steps = document.querySelectorAll('.step-card');
+        let completedSteps = JSON.parse(localStorage.getItem('completedServerSteps')) || [];
+
+        // --- Progress Tracking ---
+        const updateProgress = () => {
+            steps.forEach(step => {
+                const stepId = step.dataset.stepId;
+                const checkbox = step.querySelector('.step-checkbox');
+                if (completedSteps.includes(stepId)) {
+                    step.classList.add('completed');
+                    checkbox.checked = true;
+                } else {
+                    step.classList.remove('completed');
+                    checkbox.checked = false;
+                }
+            });
+        };
+
+        steps.forEach(step => {
+            const checkbox = step.querySelector('.step-checkbox');
+            const stepId = step.dataset.stepId;
+            checkbox.addEventListener('change', () => {
+                if (checkbox.checked) {
+                    if (!completedSteps.includes(stepId)) {
+                        completedSteps.push(stepId);
+                    }
+                } else {
+                    completedSteps = completedSteps.filter(id => id !== stepId);
+                }
+                localStorage.setItem('completedServerSteps', JSON.stringify(completedSteps));
+                updateProgress();
+            });
+        });
+
+        // --- Copy to Clipboard ---
+        document.querySelectorAll('.copy-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                const code = button.previousElementSibling.textContent;
+                navigator.clipboard.writeText(code).then(() => {
+                    const originalText = button.textContent;
+                    button.textContent = 'Copied!';
+                    setTimeout(() => {
+                        button.textContent = originalText;
+                    }, 2000);
+                });
+            });
+        });
+
+        // --- Theme Management ---
+        const themes = ['theme-ubuntu', 'theme-pastel-terminal', 'theme-light-fruity'];
+        const themeData = {
+            'theme-ubuntu': { particleColor: '#E95420', lineColor: '#58334d' },
+            'theme-pastel-terminal': { particleColor: '#A48DFA', lineColor: '#403d52' },
+            'theme-light-fruity': { particleColor: '#FF7043', lineColor: '#FFCCBC' },
+        };
+        let currentThemeIndex = 0;
+
+        const loadParticles = (theme) => {
+            if (window.pJSDom && window.pJSDom.length > 0) {
+                window.pJSDom[0].pJS.fn.vendors.destroypJS();
+                window.pJSDom = [];
+            }
+            particlesJS('particles-js', {
+                "particles": { "number": { "value": 50, "density": { "enable": true, "value_area": 800 } }, "color": { "value": themeData[theme].particleColor }, "shape": { "type": "circle" }, "opacity": { "value": 0.5, "random": false }, "size": { "value": 3, "random": true }, "line_linked": { "enable": true, "distance": 150, "color": themeData[theme].lineColor, "opacity": 0.4, "width": 1 }, "move": { "enable": true, "speed": 1, "direction": "none", "out_mode": "out" } }, "interactivity": { "detect_on": "canvas", "events": { "onhover": { "enable": true, "mode": "grab" }, "onclick": { "enable": false } } }, "retina_detect": true
+            });
+        }
+
+        const setTheme = (themeName) => {
+            document.documentElement.className = themeName;
+            localStorage.setItem('server-guide-theme', themeName);
+            currentThemeIndex = themes.indexOf(themeName);
+            loadParticles(themeName);
+        }
+
+        document.getElementById('theme-fab-toggle').addEventListener('click', () => {
+            currentThemeIndex = (currentThemeIndex + 1) % themes.length;
+            setTheme(themes[currentThemeIndex]);
+        });
+
+        // --- Initial Load ---
+        const startApp = () => {
+            const savedTheme = localStorage.getItem('server-guide-theme') || 'theme-ubuntu';
+            setTheme(savedTheme);
+            updateProgress();
+        };
+
+        startApp();
+    });
+    </script>
+</body>
+</html>
