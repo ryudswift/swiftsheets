@@ -48,7 +48,7 @@
         }
 
         /* Hover effect for the card */
-        .card:hover {
+        .card-container:hover .card { /* Apply hover to container to avoid flicker with new button */
             transform: translateZ(20px) rotateX(5deg) rotateY(5deg);
             box-shadow: 0 0 30px rgba(0, 191, 255, 0.6), 
                         0 0 60px rgba(0, 191, 255, 0.3),
@@ -78,6 +78,45 @@
             color: #00bfff; /* Deep sky blue */
             text-shadow: 0 0 5px rgba(0, 191, 255, 0.7);
         }
+        
+        /* Gemini API Button Styling */
+        .gemini-btn {
+            background-color: rgba(0, 191, 255, 0.1);
+            border: 1px solid rgba(0, 191, 255, 0.4);
+            color: #00bfff;
+            transition: background-color 0.3s, box-shadow 0.3s;
+        }
+
+        .gemini-btn:hover {
+            background-color: rgba(0, 191, 255, 0.2);
+            box-shadow: 0 0 15px rgba(0, 191, 255, 0.5);
+        }
+
+        /* Modal Styling */
+        .modal-overlay {
+            background-color: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+        }
+        .modal-content {
+            background: #0a0a1a;
+            border: 1px solid rgba(0, 191, 255, 0.3);
+            box-shadow: 0 0 30px rgba(0, 191, 255, 0.6);
+        }
+        
+        /* Simple spinner for loading */
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #00bfff;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body class="min-h-screen w-full">
@@ -95,11 +134,26 @@
         </div>
     </div>
 
+    <!-- Modal for Gemini API Response -->
+    <div id="gemini-modal" class="fixed inset-0 w-full h-full flex items-center justify-center modal-overlay z-50 hidden">
+        <div class="modal-content rounded-lg p-6 w-11/12 md:w-2/3 lg:w-1/2 max-h-[80vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-4">
+                <h3 id="modal-title" class="text-2xl orbitron card-title">Generating Learning Path...</h3>
+                <button id="close-modal" class="text-white text-2xl">&times;</button>
+            </div>
+            <div id="modal-body">
+                <div class="flex justify-center items-center h-48">
+                    <div class="loader"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
     <script>
         // --- Particle Network Animation ---
         const canvas = document.getElementById('particle-canvas');
         const ctx = canvas.getContext('2d');
-
         let particlesArray;
 
         function setupCanvas() {
@@ -114,7 +168,6 @@
                 let directionX = (Math.random() * .4) - .2;
                 let directionY = (Math.random() * .4) - .2;
                 let color = 'rgba(0, 191, 255, 0.8)';
-
                 particlesArray.push({ x, y, directionX, directionY, size, color });
             }
         }
@@ -122,19 +175,12 @@
         function animateParticles() {
             requestAnimationFrame(animateParticles);
             ctx.clearRect(0, 0, innerWidth, innerHeight);
-
             for (let i = 0; i < particlesArray.length; i++) {
                 let particle = particlesArray[i];
                 particle.x += particle.directionX;
                 particle.y += particle.directionY;
-
-                if (particle.x + particle.size > canvas.width || particle.x - particle.size < 0) {
-                    particle.directionX = -particle.directionX;
-                }
-                if (particle.y + particle.size > canvas.height || particle.y - particle.size < 0) {
-                    particle.directionY = -particle.directionY;
-                }
-                
+                if (particle.x + particle.size > canvas.width || particle.x - particle.size < 0) { particle.directionX = -particle.directionX; }
+                if (particle.y + particle.size > canvas.height || particle.y - particle.size < 0) { particle.directionY = -particle.directionY; }
                 ctx.beginPath();
                 ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2, false);
                 ctx.fillStyle = particle.color;
@@ -147,9 +193,7 @@
             let opacityValue = 1;
             for (let a = 0; a < particlesArray.length; a++) {
                 for (let b = a; b < particlesArray.length; b++) {
-                    let distance = ((particlesArray[a].x - particlesArray[b].x) * (particlesArray[a].x - particlesArray[b].x)) +
-                                 ((particlesArray[a].y - particlesArray[b].y) * (particlesArray[a].y - particlesArray[b].y));
-                    
+                    let distance = ((particlesArray[a].x - particlesArray[b].x) * (particlesArray[a].x - particlesArray[b].x)) + ((particlesArray[a].y - particlesArray[b].y) * (particlesArray[a].y - particlesArray[b].y));
                     if (distance < (canvas.width / 7) * (canvas.height / 7)) {
                         opacityValue = 1 - (distance / 20000);
                         ctx.strokeStyle = `rgba(0, 191, 255, ${opacityValue})`;
@@ -163,16 +207,11 @@
             }
         }
 
-        window.addEventListener('resize', () => {
-            setupCanvas();
-        });
-
-        // Initialize and start animation
+        window.addEventListener('resize', setupCanvas);
         setupCanvas();
         animateParticles();
 
-
-        // --- Wargame Card Generation ---
+        // --- Wargame Data and Card Generation ---
         const wargames = [
             { title: "OverTheWire: Bandit", description: "A wargame for beginners to learn the Linux command line and basic security concepts.", url: "https://overthewire.org/wargames/bandit/" },
             { title: "Terminus", description: "A terminal-based 'choose your own adventure' game to practice basic Linux commands.", url: "https://www.terminist.com/" },
@@ -192,16 +231,23 @@
         ];
 
         const grid = document.getElementById('wargames-grid');
+        const modal = document.getElementById('gemini-modal');
+        const modalTitle = document.getElementById('modal-title');
+        const modalBody = document.getElementById('modal-body');
+        const closeModalBtn = document.getElementById('close-modal');
 
         wargames.forEach(game => {
             const cardContainer = document.createElement('div');
-            cardContainer.className = 'card-container';
+            cardContainer.className = 'card-container h-full';
+
+            const cardContentWrapper = document.createElement('div');
+            cardContentWrapper.className = 'card rounded-lg h-full flex flex-col p-6';
 
             const cardLink = document.createElement('a');
             cardLink.href = game.url;
             cardLink.target = '_blank';
             cardLink.rel = 'noopener noreferrer';
-            cardLink.className = 'card block p-6 rounded-lg h-full flex flex-col';
+            cardLink.className = 'flex-grow';
 
             const title = document.createElement('h2');
             title.className = 'text-2xl font-bold orbitron card-title mb-3';
@@ -218,26 +264,91 @@
             cardLink.appendChild(title);
             cardLink.appendChild(description);
             cardLink.appendChild(linkIndicator);
-            cardContainer.appendChild(cardLink);
+
+            const geminiButton = document.createElement('button');
+            geminiButton.className = 'gemini-btn font-bold py-2 px-4 rounded-lg mt-4 w-full';
+            geminiButton.innerHTML = '✨ Generate Learning Path';
+            geminiButton.onclick = (e) => {
+                e.stopPropagation(); // Prevent card link navigation
+                handleGeneratePath(game);
+            };
+            
+            cardContentWrapper.appendChild(cardLink);
+            cardContentWrapper.appendChild(geminiButton);
+            cardContainer.appendChild(cardContentWrapper);
             grid.appendChild(cardContainer);
 
             // 3D tilt effect on mouse move
             cardContainer.addEventListener('mousemove', (e) => {
-                const card = cardLink;
+                const card = cardContentWrapper;
                 const { left, top, width, height } = card.getBoundingClientRect();
                 const x = e.clientX - left - width / 2;
                 const y = e.clientY - top - height / 2;
-
-                const rotateX = (y / height) * -15; // Invert for natural feel
-                const rotateY = (x / width) * 15;
-
+                const rotateX = (y / height) * -10;
+                const rotateY = (x / width) * 10;
                 card.style.transform = `translateZ(20px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
             });
 
             cardContainer.addEventListener('mouseleave', () => {
-                cardLink.style.transform = 'translateZ(0) rotateX(0) rotateY(0)';
+                cardContentWrapper.style.transform = 'translateZ(0) rotateX(0) rotateY(0)';
             });
         });
+
+        // --- Gemini API Integration ---
+        const API_KEY = ""; // Leave blank, will be handled by the environment
+        const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${API_KEY}`;
+
+        async function handleGeneratePath(game) {
+            modal.classList.remove('hidden');
+            modalTitle.textContent = `Generating Path for ${game.title}`;
+            modalBody.innerHTML = `<div class="flex justify-center items-center h-48"><div class="loader"></div></div>`;
+
+            const prompt = `You are a helpful cybersecurity tutor. For the wargame called '${game.title}', which is described as '${game.description}', please generate a concise, beginner-friendly learning path. The path should suggest the first few key concepts or commands a beginner should focus on. Present it as a simple, encouraging guide to get started. Use markdown for simple formatting like lists and bold text.`;
+            
+            const payload = {
+                contents: [{
+                    parts: [{ text: prompt }]
+                }]
+            };
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API Error: ${response.statusText}`);
+                }
+
+                const result = await response.json();
+                
+                if (result.candidates && result.candidates.length > 0 && result.candidates[0].content.parts.length > 0) {
+                    let text = result.candidates[0].content.parts[0].text;
+                    // Basic markdown to HTML conversion
+                    text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>'); // Bold
+                    text = text.replace(/\*(.*?)\*/g, '<em>$1</em>'); // Italics
+                    text = text.replace(/`([^`]+)`/g, '<code class="bg-gray-700 text-cyan-300 px-1 rounded">$1</code>'); // Inline code
+                    text = text.replace(/\n/g, '<br>'); // Newlines
+                    modalBody.innerHTML = `<div class="text-gray-300 leading-relaxed">${text}</div>`;
+                } else {
+                    throw new Error("No content received from API.");
+                }
+
+            } catch (error) {
+                console.error("Error fetching from Gemini API:", error);
+                modalBody.innerHTML = `<p class="text-red-400">Sorry, something went wrong while generating the learning path. Please try again later.</p>`;
+            }
+        }
+
+        closeModalBtn.onclick = () => modal.classList.add('hidden');
+        modal.onclick = (e) => {
+            if (e.target === modal) {
+                modal.classList.add('hidden');
+            }
+        };
+
     </script>
 </body>
 </html>
