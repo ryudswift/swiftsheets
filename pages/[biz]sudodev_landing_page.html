@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SudoDev | Automation & Systems Engineering v1.03</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        /* Custom styles for the SudoDev theme */
+        body {
+            background-color: #0f1117;
+            color: #e6e6e6;
+            font-family: 'Inter', sans-serif;
+        }
+
+        h1, h2, h3, .font-mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .text-teal { color: #00e3cc; }
+        .text-amber { color: #ffa600; }
+        .bg-teal { background-color: #00e3cc; }
+
+        .glass-card {
+            background: rgba(15, 17, 23, 0.5);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .glass-card:hover {
+            border-color: #00e3cc;
+            transform: translateY(-5px);
+            box-shadow: 0 0 20px rgba(0, 227, 204, 0.2);
+        }
+
+        .animated-grid {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            background-image:
+                linear-gradient(to right, rgba(0, 227, 204, 0.1) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(0, 227, 204, 0.1) 1px, transparent 1px);
+            background-size: 40px 40px;
+            animation: pan-grid 60s linear infinite;
+        }
+
+        @keyframes pan-grid {
+            0% { background-position: 0 0; }
+            100% { background-position: 1200px 1200px; }
+        }
+
+        .cursor::after {
+            content: '▊';
+            animation: blink 1s step-end infinite;
+            color: #00e3cc;
+            margin-left: 0.25rem;
+        }
+
+        @keyframes blink {
+            50% { opacity: 0; }
+        }
+        
+        /* Scroll animation styles */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+        }
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .btn-primary {
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(0, 227, 204, 0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.4s ease, height 0.4s ease;
+            z-index: -1;
+        }
+
+        .btn-primary:hover::before {
+            width: 200%;
+            height: 200%;
+        }
+        
+        /* Interactive Flip Card styles */
+        .flip-card {
+            background-color: transparent;
+            width: 100%;
+            height: 200px;
+            perspective: 1000px;
+        }
+        .flip-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+        .flip-card:hover .flip-card-inner {
+            transform: rotateY(180deg);
+        }
+        .flip-card-front, .flip-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden; /* Safari */
+            backface-visibility: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: 0.5rem;
+        }
+        .flip-card-front {
+            background: rgba(15, 17, 23, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .flip-card-back {
+            background-color: #00e3cc;
+            color: #0f1117;
+            transform: rotateY(180deg);
+            padding: 1rem;
+        }
+
+    </style>
+</head>
+<body class="antialiased">
+    <div class="relative overflow-hidden">
+        <div class="animated-grid"></div>
+        <div class="relative z-10">
+
+            <!-- Header -->
+            <header class="absolute top-0 left-0 right-0 py-6 px-4 md:px-8">
+                <nav class="container mx-auto flex justify-between items-center">
+                    <div class="text-2xl font-bold font-mono">
+                        <span class="text-teal">></span> sudoDev<span class="cursor"></span>
+                    </div>
+                    <div class="hidden md:flex space-x-8">
+                        <a href="#about" class="hover:text-teal transition-colors">About</a>
+                        <a href="#services" class="hover:text-teal transition-colors">Services</a>
+                        <a href="#processes" class="hover:text-teal transition-colors">Processes</a>
+                        <a href="#contact" class="hover:text-teal transition-colors">Contact</a>
+                    </div>
+                </nav>
+            </header>
+
+            <!-- Hero Section -->
+            <section class="min-h-screen flex items-center justify-center text-center px-4">
+                <div class="max-w-4xl">
+                    <h1 id="hero-headline" class="text-4xl md:text-6xl lg:text-7xl font-bold mb-4"></h1>
+                    <p class="text-lg md:text-xl text-gray-300 max-w-2xl mx-auto mb-8">
+                        I leverage automation, system administration, and secure self-hosting to empower small businesses and solopreneurs.
+                    </p>
+                    <a href="#contact" class="btn-primary inline-block bg-transparent border-2 border-teal text-teal font-bold py-3 px-8 rounded-lg text-lg transition-all duration-300 ease-in-out hover:shadow-[0_0_15px_rgba(0,227,204,0.5)]">
+                        Deploy Solution
+                    </a>
+                </div>
+            </section>
+
+            <!-- About Section -->
+            <section id="about" class="py-20 md:py-32 px-4">
+                <div class="container mx-auto max-w-5xl">
+                    <div class="reveal grid md:grid-cols-2 gap-12 items-center">
+                        <div>
+                            <h2 class="text-3xl md:text-4xl font-bold mb-4">
+                                <span class="text-teal">//</span> About Me
+                            </h2>
+                            <p class="mb-4 text-gray-300">
+                                I'm Russ, an Automation Consultant and Systems Engineer. My background blends a Mechanical Engineering degree with years of hands-on experience in tech, systems administration, and workflow automation.
+                            </p>
+                             <h3 class="text-2xl font-bold mt-8 mb-4 text-amber">My Approach</h3>
+                            <p class="text-gray-300">
+                                I focus on practical, robust solutions. My process is built on clear communication, prioritizing your control over your own data, and delivering tangible value quickly.
+                            </p>
+                        </div>
+                        <div class="flex justify-center">
+                           <img src="https://placehold.co/400x400/0f1117/00e3cc?text=SudoDev" alt="SudoDev Abstract Representation" class="rounded-full border-4 border-teal/20 shadow-lg shadow-teal/10" onerror="this.onerror=null;this.src='https://placehold.co/400x400/0f1117/e6e6e6?text=Image+Error';">
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Services Section -->
+            <section id="services" class="py-20 md:py-32 px-4 bg-black bg-opacity-20">
+                <div class="container mx-auto max-w-6xl">
+                    <div class="text-center mb-12 reveal">
+                        <h2 class="text-3xl md:text-4xl font-bold mb-4">
+                            <span class="text-teal">//</span> Core Expertise
+                        </h2>
+                        <p class="text-gray-300 max-w-2xl mx-auto">From infrastructure to integration, I build systems that work for you.</p>
+                    </div>
+                    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        <!-- Service Card 1 -->
+                        <div class="reveal glass-card p-8 rounded-lg text-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mx-auto mb-4 text-amber"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect><rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect><line x1="6" y1="6" x2="6.01" y2="6"></line><line x1="6" y1="18" x2="6.01" y2="18"></line></svg>
+                            <h3 class="text-2xl font-bold mb-2">System Administration</h3>
+                            <p class="text-gray-400">Secure management of cloud infrastructure, Ubuntu servers, and Docker environments.</p>
+                        </div>
+                        <!-- Service Card 2 -->
+                        <div class="reveal glass-card p-8 rounded-lg text-center" style="transition-delay: 100ms;">
+                             <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mx-auto mb-4 text-amber"><path d="M12 2l-2 4-4 2 4 2 2 4 2-4 4-2-4-2-2-4zM20 12l-2 4-4 2 4 2 2 4 2-4 4-2-4-2-2-4z"></path></svg>
+                            <h3 class="text-2xl font-bold mb-2">Workflow Automation</h3>
+                            <p class="text-gray-400">Designing N8N & Make.com workflows to eliminate repetitive tasks and connect systems via APIs.</p>
+                        </div>
+                        <!-- Service Card 3 -->
+                        <div class="reveal glass-card p-8 rounded-lg text-center" style="transition-delay: 200ms;">
+                             <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mx-auto mb-4 text-amber"><polyline points="22 12 16 12 14 15 10 9 8 12 2 12"></polyline><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path></svg>
+                            <h3 class="text-2xl font-bold mb-2">Data & Operations</h3>
+                            <p class="text-gray-400">Custom Python scripts, data processing pipelines, and integrated operational dashboards.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Interactive Processes Section -->
+            <section id="processes" class="py-20 md:py-32 px-4">
+                <div class="container mx-auto max-w-6xl">
+                    <div class="text-center mb-16 reveal">
+                        <h2 class="text-3xl md:text-4xl font-bold mb-4">
+                            <span class="text-teal">//</span> Augment Your Processes
+                        </h2>
+                        <p class="text-gray-300 max-w-2xl mx-auto">Hover over a process to reveal its potential. Manual work is a choice, not a necessity.</p>
+                    </div>
+                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-8">
+                        
+                        <!-- Card 1: Lead Generation -->
+                        <div class="reveal flip-card">
+                            <div class="flip-card-inner">
+                                <div class="flip-card-front">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mb-4 text-amber"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="18" y1="8" x2="23" y2="13"></line><line x1="23" y1="8" x2="18" y2="13"></line></svg>
+                                    <h3 class="text-xl font-bold">Lead Generation</h3>
+                                </div>
+                                <div class="flip-card-back">
+                                    <p class="font-bold text-lg font-mono">It's archaic not to augment your outreach.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Card 2: Client Onboarding -->
+                        <div class="reveal flip-card" style="transition-delay: 100ms;">
+                            <div class="flip-card-inner">
+                                <div class="flip-card-front">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mb-4 text-amber"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                                    <h3 class="text-xl font-bold">Client Onboarding</h3>
+                                </div>
+                                <div class="flip-card-back">
+                                    <p class="font-bold text-lg font-mono">First impressions should be seamless, not stressful.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Card 3: Repetitive Tasks -->
+                        <div class="reveal flip-card" style="transition-delay: 200ms;">
+                            <div class="flip-card-inner">
+                                <div class="flip-card-front">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mb-4 text-amber"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path></svg>
+                                    <h3 class="text-xl font-bold">Repetitive Tasks</h3>
+                                </div>
+                                <div class="flip-card-back">
+                                    <p class="font-bold text-lg font-mono">Reclaim your hours from the tyranny of the mundane.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Card 4: Data Management -->
+                        <div class="reveal flip-card" style="transition-delay: 300ms;">
+                            <div class="flip-card-inner">
+                                <div class="flip-card-front">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mb-4 text-amber"><path d="M3 3v18h18"></path><path d="M18.7 8a6 6 0 0 0-8.4 0L3 16.6"></path><path d="M15 13a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"></path></svg>
+                                    <h3 class="text-xl font-bold">Data Management</h3>
+                                </div>
+                                <div class="flip-card-back">
+                                    <p class="font-bold text-lg font-mono">Transform scattered data into strategic insight.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Card 5: Content Repurposing -->
+                        <div class="reveal flip-card" style="transition-delay: 400ms;">
+                            <div class="flip-card-inner">
+                                <div class="flip-card-front">
+                                     <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mb-4 text-amber"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.72"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.72-1.72"></path></svg>
+                                    <h3 class="text-xl font-bold">Content Repurposing</h3>
+                                </div>
+                                <div class="flip-card-back">
+                                    <p class="font-bold text-lg font-mono">Create once, distribute infinitely, automatically.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </section>
+
+            <!-- Contact Section -->
+            <section id="contact" class="py-20 md:py-32 px-4 bg-black bg-opacity-20">
+                <div class="container mx-auto max-w-3xl text-center">
+                    <div class="reveal">
+                        <h2 class="text-3xl md:text-4xl font-bold mb-4">
+                            <span class="text-teal">//</span> Ready to Automate?
+                        </h2>
+                        <p class="text-lg md:text-xl text-gray-300 mb-8">
+                            Let's discuss how we can eliminate bottlenecks and streamline your operations.
+                        </p>
+                        <a href="mailto:sudodevsocial@gmail.com" class="btn-primary inline-block bg-transparent border-2 border-teal text-teal font-bold py-3 px-8 rounded-lg text-lg transition-all duration-300 ease-in-out hover:shadow-[0_0_15px_rgba(0,227,204,0.5)]">
+                            Contact Me
+                        </a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Footer -->
+            <footer class="py-8 px-4">
+                <div class="container mx-auto text-center text-gray-500">
+                    &copy; 2025 SudoDev. All rights reserved.
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <script>
+        // --- Typing effect for hero headline ---
+        const headlineText = "Automating Complexity, Simplifying Growth.";
+        const headlineEl = document.getElementById('hero-headline');
+        let i = 0;
+
+        function typeWriter() {
+            if (i < headlineText.length) {
+                headlineEl.innerHTML += headlineText.charAt(i);
+                i++;
+                setTimeout(typeWriter, 70);
+            } else {
+                headlineEl.parentElement.classList.add('cursor');
+            }
+        }
+        
+        // --- Scroll reveal animations ---
+        const revealElements = document.querySelectorAll('.reveal');
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, {
+            threshold: 0.1
+        });
+
+        revealElements.forEach(el => observer.observe(el));
+
+        // --- Start animations on load ---
+        window.addEventListener('load', () => {
+            typeWriter();
+        });
+    </script>
+</body>
+</html>
