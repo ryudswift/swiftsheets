@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Security Toolkit</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0f172a; /* slate-900 */
+            color: #94a3b8; /* slate-400 */
+        }
+        .font-tech {
+            font-family: 'Share Tech Mono', monospace;
+        }
+        .terminal-header {
+            background-color: #1e293b; /* slate-800 */
+            border-bottom: 1px solid #334155; /* slate-700 */
+        }
+        .terminal-body {
+            background-color: #131c2b;
+        }
+        .hint-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-out;
+        }
+        .hint-content.show {
+            max-height: 500px; /* Adjust as needed */
+            transition: max-height 0.5s ease-in;
+        }
+        .fade-in-section {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+        .fade-in-section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .status-dot {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: .5;
+            }
+        }
+    </style>
+</head>
+<body class="bg-slate-900">
+
+    <div class="max-w-4xl mx-auto p-4 md:p-8">
+
+        <!-- Header -->
+        <header class="text-center mb-12 fade-in-section">
+            <h1 class="text-3xl md:text-4xl font-bold text-sky-400 mb-2 font-tech tracking-wider">SYSTEM SECURITY TOOLKIT</h1>
+            <p class="text-slate-400">An interactive guide to checking ports and vulnerabilities on your system.</p>
+            <div class="flex items-center justify-center mt-4 text-sm">
+                 <span class="flex h-3 w-3 relative">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+                </span>
+                <span class="ml-2 text-green-400">STATUS: SECURE ANALYSIS MODE</span>
+            </div>
+        </header>
+
+        <!-- Section 1: Built-in Tools -->
+        <section class="mb-16 fade-in-section">
+            <h2 class="text-2xl font-bold text-sky-400 mb-6 font-tech border-b-2 border-slate-700 pb-2">1. BUILT-IN TERMINAL TOOLS</h2>
+            
+            <!-- Tool: ss -->
+            <div class="mb-10">
+                <h3 class="font-semibold text-xl text-slate-200 mb-2">Tool: <code class="font-tech text-emerald-300">ss</code> (Socket Statistics)</h3>
+                <p class="mb-4">The modern tool for investigating sockets. Use it to quickly see what ports are open and which processes are listening on them. It has replaced the older `netstat` command.</p>
+                <div class="rounded-lg overflow-hidden border border-slate-700">
+                    <div class="terminal-header p-2 flex justify-between items-center">
+                        <span class="text-xs text-slate-400">ryud@sudev:~$</span>
+                        <button class="copy-btn bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold py-1 px-2 rounded transition-colors" data-clipboard="sudo ss -ltunp">Copy</button>
+                    </div>
+                    <pre class="terminal-body p-4 text-sm text-slate-300 overflow-x-auto"><code class="font-tech">$ sudo ss -ltunp</code></pre>
+                </div>
+                <div class="mt-4">
+                    <button class="hint-toggle text-sky-400 hover:text-sky-300 font-semibold text-sm flex items-center">
+                        <span>🤔 Hint: What am I looking for?</span>
+                        <svg class="w-4 h-4 ml-2 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div class="hint-content mt-2 text-sm">
+                        <div class="p-4 bg-slate-800 border border-slate-700 rounded-md">
+                            You're getting a baseline inventory. Look for any surprising services in the `Process` column. If you see a process you don't recognize listening on a port, that's a red flag worth investigating. Also, check the `Local Address:Port` column to see if a service is exposed to the internet (`0.0.0.0` or `*`) or only to the local machine (`127.0.0.1`).
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: Essential Scanner -->
+        <section class="mb-16 fade-in-section">
+            <h2 class="text-2xl font-bold text-sky-400 mb-6 font-tech border-b-2 border-slate-700 pb-2">2. ESSENTIAL NETWORK SCANNER</h2>
+
+            <!-- Tool: nmap -->
+            <div class="mb-10">
+                <h3 class="font-semibold text-xl text-slate-200 mb-2">Tool: <code class="font-tech text-emerald-300">nmap</code> (Network Mapper)</h3>
+                <p class="mb-4">The swiss-army knife for network exploration and security auditing. While `ss` tells you what your machine *thinks* is open, `nmap` tells you what is actually reachable from the network. It's essential for verifying your firewall rules and identifying services.</p>
+                
+                <h4 class="font-semibold text-lg text-slate-300 mt-6 mb-3">2a. Basic Port Scan</h4>
+                <div class="rounded-lg overflow-hidden border border-slate-700">
+                    <div class="terminal-header p-2 flex justify-between items-center">
+                        <span class="text-xs text-slate-400">ryud@sudev:~$</span>
+                        <button class="copy-btn bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold py-1 px-2 rounded transition-colors" data-clipboard="nmap localhost">Copy</button>
+                    </div>
+                    <pre class="terminal-body p-4 text-sm text-slate-300 overflow-x-auto"><code class="font-tech">$ nmap localhost</code></pre>
+                </div>
+                 <div class="mt-4">
+                    <button class="hint-toggle text-sky-400 hover:text-sky-300 font-semibold text-sm flex items-center">
+                        <span>🤔 Hint: What am I looking for?</span>
+                        <svg class="w-4 h-4 ml-2 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div class="hint-content mt-2 text-sm">
+                        <div class="p-4 bg-slate-800 border border-slate-700 rounded-md">
+                            This command confirms which ports are actually open from a network perspective. Compare this list to the `ss` output. If a port is open here that you didn't expect, your firewall might not be configured correctly.
+                        </div>
+                    </div>
+                </div>
+
+                <h4 class="font-semibold text-lg text-slate-300 mt-6 mb-3">2b. Service & Version Detection</h4>
+                 <div class="rounded-lg overflow-hidden border border-slate-700">
+                    <div class="terminal-header p-2 flex justify-between items-center">
+                        <span class="text-xs text-slate-400">ryud@sudev:~$</span>
+                        <button class="copy-btn bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold py-1 px-2 rounded transition-colors" data-clipboard="sudo nmap -sV localhost">Copy</button>
+                    </div>
+                    <pre class="terminal-body p-4 text-sm text-slate-300 overflow-x-auto"><code class="font-tech">$ sudo nmap -sV localhost</code></pre>
+                </div>
+                <div class="mt-4">
+                    <button class="hint-toggle text-sky-400 hover:text-sky-300 font-semibold text-sm flex items-center">
+                        <span>🤔 Hint: What am I looking for?</span>
+                        <svg class="w-4 h-4 ml-2 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div class="hint-content mt-2 text-sm">
+                        <div class="p-4 bg-slate-800 border border-slate-700 rounded-md">
+                            Here you're looking for <strong class="text-amber-400">outdated software versions</strong>. An attacker doesn't just see "port 5432," they see "PostgreSQL 9.5." They can then look for exploits for that specific version. Your goal is to find these old versions and update them.
+                        </div>
+                    </div>
+                </div>
+
+                <h4 class="font-semibold text-lg text-slate-300 mt-6 mb-3">2c. Vulnerability Scan</h4>
+                 <div class="rounded-lg overflow-hidden border border-slate-700">
+                    <div class="terminal-header p-2 flex justify-between items-center">
+                        <span class="text-xs text-slate-400">ryud@sudev:~$</span>
+                        <button class="copy-btn bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold py-1 px-2 rounded transition-colors" data-clipboard="sudo nmap --script vuln localhost">Copy</button>
+                    </div>
+                    <pre class="terminal-body p-4 text-sm text-slate-300 overflow-x-auto"><code class="font-tech">$ sudo nmap --script vuln localhost</code></pre>
+                </div>
+                <div class="mt-4">
+                    <button class="hint-toggle text-sky-400 hover:text-sky-300 font-semibold text-sm flex items-center">
+                        <span>🤔 Hint: What am I looking for?</span>
+                        <svg class="w-4 h-4 ml-2 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div class="hint-content mt-2 text-sm">
+                        <div class="p-4 bg-slate-800 border border-slate-700 rounded-md">
+                           Look for any output labeled with <strong class="text-red-400">"VULNERABLE"</strong>. This command actively (but safely) tests for known flaws. If it finds something, it will often give you a CVE number (e.g., CVE-2022-12345) which you can search online to understand the risk and how to fix it.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: 3rd Party Tools -->
+        <section class="mb-12 fade-in-section">
+            <h2 class="text-2xl font-bold text-sky-400 mb-6 font-tech border-b-2 border-slate-700 pb-2">3. UPGRADED & THIRD-PARTY TOOLS</h2>
+            <p class="mb-8">For deeper and more automated analysis, you can use specialized open-source tools. These are often more powerful and provide more detailed reports.</p>
+            
+            <div class="grid md:grid-cols-2 gap-6">
+                <!-- OpenVAS/GVM -->
+                <div class="bg-slate-800 p-6 rounded-lg border border-slate-700">
+                    <h3 class="font-bold text-lg text-slate-200">Greenbone (OpenVAS)</h3>
+                    <p class="text-sm mt-2 mb-4">A full-featured vulnerability scanner with a web interface. It maintains a huge, daily-updated feed of network vulnerability tests.</p>
+                    <a href="https://www.greenbone.net/en/community-edition/" target="_blank" rel="noopener noreferrer" class="font-tech text-sky-400 hover:text-sky-300 transition-colors">Official Site &rarr;</a>
+                </div>
+                <!-- OWASP ZAP -->
+                <div class="bg-slate-800 p-6 rounded-lg border border-slate-700">
+                    <h3 class="font-bold text-lg text-slate-200">OWASP ZAP</h3>
+                    <p class="text-sm mt-2 mb-4">The world's most popular free web application security scanner. Essential if any of your open ports are serving web pages or APIs.</p>
+                    <a href="https://www.zaproxy.org/" target="_blank" rel="noopener noreferrer" class="font-tech text-sky-400 hover:text-sky-300 transition-colors">Official Site &rarr;</a>
+                </div>
+                <!-- Trivy -->
+                <div class="bg-slate-800 p-6 rounded-lg border border-slate-700">
+                    <h3 class="font-bold text-lg text-slate-200">Trivy</h3>
+                    <p class="text-sm mt-2 mb-4">A simple and comprehensive scanner for vulnerabilities in container images, filesystems, and Git repos. Since you use Docker, this is a must-have.</p>
+                    <a href="https://github.com/aquasecurity/trivy" target="_blank" rel="noopener noreferrer" class="font-tech text-sky-400 hover:text-sky-300 transition-colors">GitHub Repo &rarr;</a>
+                </div>
+                <!-- Nuclei -->
+                <div class="bg-slate-800 p-6 rounded-lg border border-slate-700">
+                    <h3 class="font-bold text-lg text-slate-200">Nuclei</h3>
+                    <p class="text-sm mt-2 mb-4">A fast, template-based vulnerability scanner. It uses a large community-curated set of templates to send requests and check for thousands of known issues.</p>
+                    <a href="https://github.com/projectdiscovery/nuclei" target="_blank" rel="noopener noreferrer" class="font-tech text-sky-400 hover:text-sky-300 transition-colors">GitHub Repo &rarr;</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="text-center mt-16 pt-8 border-t border-slate-700 fade-in-section">
+             <p class="text-sm text-slate-500">End of debriefing. System analysis is a continuous process. Stay vigilant.</p>
+             <p class="text-xs text-slate-600 mt-2 font-tech">Generated on: <span id="timestamp"></span></p>
+        </footer>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // --- Copy to Clipboard Functionality ---
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const textToCopy = btn.dataset.clipboard;
+                    // Use document.execCommand for broader iframe compatibility
+                    const textArea = document.createElement('textarea');
+                    textArea.value = textToCopy;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    try {
+                        document.execCommand('copy');
+                        const originalText = btn.textContent;
+                        btn.textContent = 'Copied!';
+                        btn.classList.add('bg-green-600');
+                        setTimeout(() => {
+                            btn.textContent = originalText;
+                            btn.classList.remove('bg-green-600');
+                        }, 2000);
+                    } catch (err) {
+                        console.error('Failed to copy text: ', err);
+                    }
+                    document.body.removeChild(textArea);
+                });
+            });
+
+            // --- Hint Toggler Functionality ---
+            const hintToggles = document.querySelectorAll('.hint-toggle');
+            hintToggles.forEach(toggle => {
+                toggle.addEventListener('click', () => {
+                    const content = toggle.nextElementSibling;
+                    const icon = toggle.querySelector('svg');
+                    content.classList.toggle('show');
+                    icon.classList.toggle('rotate-180');
+                });
+            });
+            
+            // --- Fade-in on Scroll ---
+            const sections = document.querySelectorAll('.fade-in-section');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, {
+                threshold: 0.1
+            });
+            sections.forEach(section => {
+                observer.observe(section);
+            });
+            
+            // --- Timestamp ---
+            const timestampEl = document.getElementById('timestamp');
+            if(timestampEl) {
+                timestampEl.textContent = new Date().toLocaleString('en-ZA', { timeZone: 'Africa/Johannesburg' }) + " SAST";
+            }
+        });
+    </script>
+</body>
+</html>
