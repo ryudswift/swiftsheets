@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SudoDev Idea | Instagram Business Idea Database</title>
+    <!-- External Libraries: Tailwind for styling, Particles.js for animation -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Base and Theme Styles */
+        body { font-family: 'Inter', sans-serif; background-color: #1a1a1a; color: #f0f0f0; }
+        .icon { font-size: 1.5rem; margin-right: 0.75rem; color: #d2b48c; }
+
+        /* Particles.js Background Canvas */
+        #particles-js { position: fixed; width: 100%; height: 100%; top: 0; left: 0; z-index: 0; }
+        .content-wrapper { position: relative; z-index: 1; }
+
+        /* Animated Card Styling */
+        .animated-card {
+            background-color: #2c2c2c; border: 1px solid #444; border-radius: 0.75rem;
+            padding: 1.5rem; position: relative; overflow: hidden;
+            opacity: 0; transform: translateY(20px); animation: fadeIn 0.8s forwards;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+        }
+        .animated-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.4); border-color: #d2b48c; }
+        .animated-card::before {
+            content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+            background: linear-gradient(120deg, transparent, rgba(210,180,140,0.1), transparent);
+            transition: left 0.8s ease;
+        }
+        .animated-card:hover::before { left: 100%; }
+
+        /* Staggered Animation Delays for Cards */
+        main > .animated-card { animation-delay: calc(0.1s * var(--card-index, 1)); }
+        @keyframes fadeIn { to { opacity: 1; transform: translateY(0); } }
+
+        /* Badge, List, and Link Styles */
+        .status-badge, .theme-badge { display: inline-block; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.875rem; font-weight: 600; border: 1px solid; }
+        .status-new { background-color: rgba(59, 130, 246, 0.15); color: #93c5fd; border-color: #3b82f6; }
+        .status-in-progress { background-color: rgba(251, 191, 36, 0.15); color: #fde68a; border-color: #fbbf24; }
+        .status-researched { background-color: rgba(16, 185, 129, 0.15); color: #6ee7b7; border-color: #10b981; }
+        .status-archived { background-color: rgba(156, 163, 175, 0.15); color: #d1d5db; border-color: #9ca3af; }
+        .theme-badge { background-color: rgba(210,180,140,0.15); color: #d2b48c; border-color: #d2b48c; }
+        .list-item { display:flex; align-items:flex-start; padding:.5rem 0 }
+        .list-item-icon { flex-shrink:0; width:1.5rem; height:1.5rem; margin-right:.75rem; color:#d2b48c }
+        .research-card{background-color:#3a3a3a;border:1px solid #555;border-radius:0.5rem;padding:1rem;margin:0.5rem 0;transition:all 0.3s ease}
+        .research-card:hover{background-color:#4a4a4a;transform:translateY(-2px);border-color:#d2b48c}
+        .research-card a{color:#d2b48c;text-decoration:none;display:flex;align-items:center}
+        .research-card a:hover{text-decoration:underline}
+        .blueprint-step{display:flex;align-items:flex-start;padding:.75rem 0;border-bottom:1px solid #444}
+        .blueprint-step:last-child{border-bottom:none}
+        .step-number{flex-shrink:0;width:2rem;height:2rem;margin-right:1rem;background-color:#d2b48c;color:#1a1a1a;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.875rem}
+
+        /* Score Circles */
+        .score-container { display: flex; justify-content: space-around; align-items: center; flex-wrap: wrap; gap: 1rem; margin-top: 1rem; }
+        .score-circle { width: 100px; height: 100px; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; font-weight: bold; position: relative; background-color: #444; }
+        .score-circle .score-value { font-size: 1.5rem; }
+        .score-circle .score-label { font-size: 0.75rem; margin-top: 4px; }
+        .score-circle.priority { background: conic-gradient(from 180deg, #ff6b6b 0% var(--priority-percent, 0%), #444 var(--priority-percent, 0%) 100%); }
+        .score-circle.effort { background: conic-gradient(from 180deg, #ffd166 0% var(--effort-percent, 0%), #444 var(--effort-percent, 0%) 100%); }
+        .score-circle.rarity { background: conic-gradient(from 180deg, #9b5de5 0% var(--rarity-percent, 0%), #444 var(--rarity-percent, 0%) 100%); }
+        
+        /* Collapsible Details & Checklist */
+        details > summary { list-style: none; cursor: pointer; }
+        details > summary::-webkit-details-marker { display: none; }
+        .checklist-item { display: flex; align-items: center; padding: 0.75rem 0; border-bottom: 1px solid #444; cursor: pointer; transition: opacity 0.3s ease; }
+        .checklist-item:last-child { border-bottom: none; }
+        .checklist-item.completed { opacity: 0.6; }
+        .checklist-item.completed .item-text { text-decoration: line-through; }
+        .checkbox { width: 1.25rem; height: 1.25rem; margin-right: 1rem; border: 2px solid #d2b48c; border-radius: 0.25rem; display: flex; align-items: center; justify-content: center; transition: background-color 0.3s ease; flex-shrink: 0; }
+        .checklist-item.completed .checkbox { background-color: #d2b48c; }
+        .checkbox svg { display: none; width: 1rem; height: 1rem; color: #1a1a1a; }
+        .checklist-item.completed .checkbox svg { display: block; }
+        
+        /* Progress Bar */
+        .progress-container { background-color: #444; border-radius: 9999px; height: 12px; width: 100%; overflow: hidden; margin: 1rem 0 0.5rem; }
+        #progress-bar { background-color: #d2b48c; height: 100%; width: 0%; transition: width 0.5s ease-in-out; }
+        #progress-text { font-size: 0.875rem; color: #9ca3af; text-align: right; }
+        
+        /* Webhook Section & Buttons */
+        .webhook-section { background-color: rgba(210,180,140,0.1); border: 1px solid #d2b48c; }
+        .webhook-section pre { background-color: #1a1a1a; color: #f5f5dc; padding: 1rem; border-radius: 0.5rem; max-height: 200px; overflow: auto; margin: 1rem 0; }
+        .btn { padding: 0.75rem 1.5rem; border-radius: 0.5rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; margin: 0.5rem; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-primary { background-color: #d2b48c; color: #1a1a1a; border: none; }
+        .btn-primary:hover:not(:disabled) { background-color: #e6d0b8; transform: translateY(-2px); }
+        .btn-secondary { background-color: transparent; color: #d2b48c; border: 1px solid #d2b48c; }
+        .btn-secondary:hover:not(:disabled) { background-color: rgba(210, 180, 140, 0.1); }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div id="particles-js"></div>
+
+    <div class="content-wrapper container mx-auto p-4 md:p-8 max-w-4xl">
+        <header class="text-center mb-12">
+            <h1 class="text-4xl md:text-5xl font-bold text-white">SudoDev Idea Matrix</h1>
+            <p class="text-lg text-gray-300 mt-2">Automated Breakdown & Analysis</p>
+        </header>
+
+        <main class="space-y-8" id="dashboard-content">
+            <!-- Main Idea Card -->
+            <section class="animated-card" style="--card-index: 1;">
+                <div class="text-center">
+                    <div class="flex justify-center flex-wrap gap-2 mb-4">
+                        <span class="status-badge status-new">new</span>
+                        <span class="theme-badge">business</span>
+                        <span class="theme-badge">ai-automation</span>
+                        <span class="theme-badge">dev</span>
+                    </div>
+                    <h2 class="text-3xl font-bold mt-4 text-white">Instagram Business Idea Database</h2>
+                    <p class="text-gray-400 mt-2">Created: 2024-01-15T14:30:00Z</p>
+                </div>
+            </section>
+
+            <!-- Scores Card -->
+            <section class="animated-card" style="--card-index: 2;">
+                <h2 class="text-2xl font-bold flex items-center"><span class="icon">📊</span> Idea Scores</h2>
+                <div class="score-container">
+                    <div class="score-circle priority" style="--priority-percent: 85%;">
+                        <div class="score-value">85</div>
+                        <div class="score-label">Priority</div>
+                    </div>
+                    <div class="score-circle effort" style="--effort-percent: 70%;">
+                        <div class="score-value">70</div>
+                        <div class="score-label">Effort</div>
+                    </div>
+                    <div class="score-circle rarity" style="--rarity-percent: 65%;">
+                        <div class="score-value">65</div>
+                        <div class="score-label">Rarity</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Summary Card -->
+            <section class="animated-card" style="--card-index: 3;">
+                <h2 class="text-2xl font-bold flex items-center"><span class="icon">📋</span> Summary</h2>
+                <p class="text-gray-300 leading-relaxed mt-4">Create automated database harvesting business ideas from specific Instagram accounts like Koener Office for idea enrichment and future project development.</p>
+            </section>
+            
+            <!-- Pros Card (Now Collapsible) -->
+            <section class="animated-card" style="--card-index: 4;">
+                 <details>
+                    <summary class="flex items-center text-2xl font-bold text-white">
+                        <span class="icon">✅</span>
+                        <span>Pros</span>
+                    </summary>
+                    <div class="space-y-2 mt-4">
+                        <div class="list-item">
+                            <svg class="list-item-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                            <p class="text-gray-300">Automates the collection of high-quality business ideas.</p>
+                        </div>
+                         <div class="list-item">
+                            <svg class="list-item-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                            <p class="text-gray-300">Leverages AI for intelligent data enrichment and analysis.</p>
+                        </div>
+                         <div class="list-item">
+                            <svg class="list-item-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                            <p class="text-gray-300">Creates a structured, queryable database for future projects.</p>
+                        </div>
+                    </div>
+                </details>
+            </section>
+            
+            <!-- Components & Considerations Card (Now Collapsible) -->
+            <section class="animated-card" style="--card-index: 5;">
+                <details>
+                    <summary class="flex items-center text-2xl font-bold text-white">
+                        <span class="icon">⚙️</span>
+                        <span>Components & Considerations</span>
+                    </summary>
+                    <div class="space-y-2 mt-4">
+                        <div class="list-item">
+                            <svg class="list-item-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12a7.5 7.5 0 0015 0m-15 0a7.5 7.5 0 1115 0m-15 0H3m16.5 0H21m-1.5 0H12m-8.457 3.077l1.41-.513m14.095-5.13l-1.41-.513M5.106 17.785l1.153-.96M18.894 6.215l-.543.94m0 0a7.498 7.498 0 01-4.5 4.5M14.457 14.457a7.498 7.498 0 01-4.5 4.5m4.5-4.5l.94.543m-9.574-14.453l.94.543m0 0L9.5 2.25m5.5 4.5l-1.5-1.5m-5.5 5.5l1.5-1.5m5.5 5.5l-1.5-1.5m-5.5 5.5l1.5-1.5" /></svg>
+                            <p class="text-gray-300">Instagram API rate limits</p>
+                        </div>
+                        <div class="list-item">
+                            <svg class="list-item-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12a7.5 7.5 0 0015 0m-15 0a7.5 7.5 0 1115 0m-15 0H3m16.5 0H21m-1.5 0H12m-8.457 3.077l1.41-.513m14.095-5.13l-1.41-.513M5.106 17.785l1.153-.96M18.894 6.215l-.543.94m0 0a7.498 7.498 0 01-4.5 4.5M14.457 14.457a7.498 7.498 0 01-4.5 4.5m4.5-4.5l.94.543m-9.574-14.453l.94.543m0 0L9.5 2.25m5.5 4.5l-1.5-1.5m-5.5 5.5l1.5-1.5m5.5 5.5l-1.5-1.5m-5.5 5.5l1.5-1.5" /></svg>
+                            <p class="text-gray-300">Notion database schema design</p>
+                        </div>
+                        <div class="list-item">
+                            <svg class="list-item-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12a7.5 7.5 0 0015 0m-15 0a7.5 7.5 0 1115 0m-15 0H3m16.5 0H21m-1.5 0H12m-8.457 3.077l1.41-.513m14.095-5.13l-1.41-.513M5.106 17.785l1.153-.96M18.894 6.215l-.543.94m0 0a7.498 7.498 0 01-4.5 4.5M14.457 14.457a7.498 7.498 0 01-4.5 4.5m4.5-4.5l.94.543m-9.574-14.453l.94.543m0 0L9.5 2.25m5.5 4.5l-1.5-1.5m-5.5 5.5l1.5-1.5m5.5 5.5l-1.5-1.5m-5.5 5.5l1.5-1.5" /></svg>
+                            <p class="text-gray-300">AI enrichment pipeline</p>
+                        </div>
+                    </div>
+                </details>
+            </section>
+            
+            <!-- Implementation Flow Card -->
+            <section class="animated-card" style="--card-index: 6;">
+                <h2 class="text-2xl font-bold mb-4 flex items-center"><span class="icon">🚀</span> Implementation Flow</h2>
+                <div class="blueprint-step">
+                    <div class="step-number">1</div>
+                    <p class="text-gray-300">[manual-trigger]-->[instagram-scrape]-->[ai-enrichment]-->[notion-database]-->[categorization]</p>
+                </div>
+            </section>
+
+            <!-- Research Links Card -->
+            <section class="animated-card" style="--card-index: 7;">
+                <h2 class="text-2xl font-bold mb-4 flex items-center"><span class="icon">📚</span> Research Links</h2>
+                <div class="space-y-2">
+                    <div class="research-card">
+                        <a href="https://youtube.com/results?search_query=instagram+scraper+n8n+automation" target="_blank">
+                            <span class="icon">📺</span><span>Recent YouTube Tutorials</span>
+                        </a>
+                    </div>
+                    <div class="research-card">
+                        <a href="https://google.com/search?q=web+scraping+instagram+api+recent" target="_blank">
+                            <span class="icon">📰</span><span>Recent Articles & Guides</span>
+                        </a>
+                    </div>
+                    <div class="research-card">
+                        <a href="https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-base.instagram/" target="_blank">
+                            <span class="icon">📖</span><span>Relevant Documentation</span>
+                        </a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Execution Checklist Card -->
+            <section class="animated-card" style="--card-index: 8;">
+                <details open>
+                    <summary class="flex items-center text-2xl font-bold text-white">
+                        <span class="icon">✅</span>
+                        <span>Execution Checklist</span>
+                    </summary>
+                    <div class="mt-2">
+                        <div class="progress-container"><div id="progress-bar"></div></div>
+                        <p id="progress-text" class="w-full"></p>
+                        <div id="checklist-container" class="mt-4">
+                            <div class="checklist-item">
+                                <div class="checkbox"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg></div>
+                                <span class="item-text text-gray-300">Research Instagram scraping legality</span>
+                            </div>
+                            <div class="checklist-item">
+                                <div class="checkbox"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg></div>
+                                <span class="item-text text-gray-300">Design Notion database structure</span>
+                            </div>
+                            <div class="checklist-item">
+                                <div class="checkbox"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg></div>
+                                <span class="item-text text-gray-300">Create n8n workflow prototype</span>
+                            </div>
+                        </div>
+                    </div>
+                </details>
+            </section>
+
+            <!-- Process Idea Card -->
+            <section class="webhook-section animated-card" style="--card-index: 9;">
+                <h2 class="text-2xl font-bold mb-4 flex items-center"><span class="icon">🔗</span> Process Idea</h2>
+                <details>
+                    <summary class="font-semibold text-gray-300">View Raw Idea Data</summary>
+                    <pre>
+{
+  "idea_id": "business-idea-database-instagram-2024",
+  "title": "Instagram Business Idea Database",
+  "date_created": "2024-01-15T14:30:00Z",
+  "date_modified": "2024-01-15T14:30:00Z",
+  "tags": ["n8n", "automation", "business"],
+  "categories": ["business", "ai-automation", "dev"],
+  "summary": "Create automated database harvesting business ideas from specific Instagram accounts like Koener Office for idea enrichment and future project development.",
+  "priority_score": 85,
+  "effort_score": 70,
+  "rarity_score": 65,
+  "status": "new",
+  "research_links": {
+    "youtube_recent": "https://youtube.com/results?search_query=instagram+scraper+n8n+automation",
+    "articles_recent": "https://google.com/search?q=web+scraping+instagram+api+recent",
+    "documentation": "https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-base.instagram/"
+  },
+  "implementation_flow": "[manual-trigger]-->[instagram-scrape]-->[ai-enrichment]-->[notion-database]-->[categorization]",
+  "technical_considerations": ["Instagram API rate limits", "Notion database schema design", "AI enrichment pipeline"],
+  "next_actions": ["Research Instagram scraping legality", "Design Notion database structure", "Create n8n workflow prototype"],
+  "similar_ideas": [],
+  "duplicate_check": "false"
+}
+                    </pre>
+                </details>
+                <div class="flex flex-wrap gap-4 mt-6">
+                    <button id="submit-btn" class="btn btn-primary">Submit Idea</button>
+                    <button id="action-plan-btn" class="btn btn-secondary" disabled>Generate Action Plan</button>
+                </div>
+            </section>
+        </main>
+
+        <footer class="text-center mt-12 text-gray-500 text-sm">
+            <p>&copy; 2024 SudoDev. All ideas processed and structured for action.</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // --- Checklist & Progress Bar Logic ---
+            const checklistContainer = document.getElementById('checklist-container');
+            if (checklistContainer) {
+                const progressBar = document.getElementById('progress-bar');
+                const progressText = document.getElementById('progress-text');
+                const checklistItems = checklistContainer.querySelectorAll('.checklist-item');
+                const totalItems = checklistItems.length;
+
+                function updateProgress() {
+                    if (!progressBar || !progressText) return;
+                    const completedItems = checklistContainer.querySelectorAll('.checklist-item.completed').length;
+                    const percentage = totalItems > 0 ? (completedItems / totalItems) * 100 : 0;
+                    
+                    progressBar.style.width = percentage + '%';
+                    progressText.textContent = `${completedItems} / ${totalItems} tasks completed`;
+                }
+
+                checklistItems.forEach(item => {
+                    item.addEventListener('click', function() {
+                        this.classList.toggle('completed');
+                        updateProgress();
+                    });
+                });
+                updateProgress(); // Initial calculation
+            }
+            
+            // --- Webhook Button Functionality ---
+            const submitBtn = document.getElementById('submit-btn');
+            const actionPlanBtn = document.getElementById('action-plan-btn');
+            
+            if(submitBtn && actionPlanBtn) {
+                submitBtn.addEventListener('click', function() {
+                    submitBtn.innerHTML = 'Processing...';
+                    submitBtn.disabled = true;
+                    
+                    setTimeout(function() {
+                        submitBtn.innerHTML = 'Submitted!';
+                        actionPlanBtn.disabled = false;
+                        actionPlanBtn.classList.remove('btn-secondary');
+                        actionPlanBtn.classList.add('btn-primary');
+                    }, 1500);
+                });
+                
+                actionPlanBtn.addEventListener('click', function() {
+                    if (!actionPlanBtn.disabled) { window.location.href = '#action-plan'; }
+                });
+            }
+
+            // --- Particles.js Initialization ---
+            particlesJS('particles-js', {
+                "particles": { "number": { "value": 60, "density": { "enable": true, "value_area": 800 } }, "color": { "value": "#d2b48c" }, "shape": { "type": "circle" }, "opacity": { "value": 0.2, "random": true }, "size": { "value": 3, "random": true }, "line_linked": { "enable": true, "distance": 150, "color": "#444", "opacity": 0.3, "width": 1 }, "move": { "enable": true, "speed": 1, "direction": "none", "out_mode": "out" } },
+                "interactivity": { "detect_on": "canvas", "events": { "onhover": { "enable": true, "mode": "grab" }, "onclick": { "enable": false } }, "modes": { "grab": { "distance": 140, "line_linked": { "opacity": 0.5 } } } },
+                "retina_detect": true
+            });
+        });
+    </script>
+</body>
+</html>
